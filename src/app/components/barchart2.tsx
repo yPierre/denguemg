@@ -9,9 +9,9 @@ Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 // Tipagem dos dados vindos da API
 interface CityData {
-    cidade: string;
+    city: string;
     casos: number;
-    dados: {casos: number;}
+    data: {casos: number;}
 }
 
 export default function BarChart() {
@@ -35,10 +35,10 @@ export default function BarChart() {
                 }
 
                 // Extrai os nomes das cidades e os casos da posição 0
-                const labels = data.map(city => city.cidade);
+                const labels = data.map(city => city.city);
                 const casos = data.map(city => {
-                    if (Array.isArray(city.dados) && city.dados.length > 0) {
-                        return city.dados[0]?.casos || 0; // Pega a posição 0 de `casos` dentro do primeiro item de `dados`
+                    if (Array.isArray(city.data) && city.data.length > 0) {
+                        return city.data[0]?.casos || 0; // Pega a posição 0 de `casos` dentro do primeiro item de `dados`
                     }
                     return 0; // Se `dados` estiver vazio, assume 0 casos
                 });
