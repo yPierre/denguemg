@@ -6,7 +6,7 @@ export async function GET() {
         console.log("Entrou no route!");
         const client = await clientPromise;
         const db = client.db("denguemg");
-        const cities = await db.collection("citiesv2").find().limit(10).toArray();
+        const cities = await db.collection("citiesv3").find().toArray();
 
         return NextResponse.json(cities);
     } catch (error) {
