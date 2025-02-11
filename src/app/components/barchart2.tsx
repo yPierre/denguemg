@@ -10,48 +10,56 @@ Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 // Tipagem dos dados vindos da API
 interface CityData {
     city: string;
+    geocode: number;
     casos: number;
-    data: {casos: number;}
+    nivel: number;
 }
 
-export default function BarChart() {
+export default function BarChart2() {
     const [chartData, setChartData] = useState<{
-            labels: string[];
-            datasets: ChartDataset<"bar">[];
+        labels: string[];
+        datasets: ChartDataset<"bar">[];
     }>({
-            labels: [],
-            datasets: []
+        labels: [],
+        datasets: []
     });
+
+    const [chartTitle, setChartTitle] = useState("Casos de Dengue");
 
     useEffect(() => {
         async function fetchData() {
             try {
-                const response = await fetch("/api/cities");
-                const data: CityData[] = await response.json();
+                const response = await fetch("/api/state");
+                const stateData = await response.json();
 
-                if (!Array.isArray(data)) {
-                    console.error("Os dados recebidos não são um array:", data);
+                if (!stateData || !Array.isArray(stateData.cities)) {
+                    console.error("Dados inválidos recebidos:", stateData);
                     return;
                 }
 
-                // Extrai os nomes das cidades e os casos da posição 0
-                const labels = data.map(city => city.city);
-                const casos = data.map(city => {
-                    if (Array.isArray(city.data) && city.data.length > 0) {
-                        return city.data[0]?.casos || 0; // Pega a posição 0 de `casos` dentro do primeiro item de `dados`
-                    }
-                    return 0; // Se `dados` estiver vazio, assume 0 casos
-                });
+                // Capturar os dados de SE (Semana Epidemiológica)
+                const latestSE = stateData.cities[0]?.SE || "Desconhecido"; 
 
-                // Atualiza o estado com novos dados
+                // Atualizar o título do gráfico
+                setChartTitle(`Casos de dengue referentes à semana ${latestSE.toString().slice(4)} e ano ${latestSE.toString().slice(0, 4)}`);
+
+                // Ordenar as cidades pelos casos na última semana (descendente)
+                const sortedCities = stateData.cities
+                    .sort((a: CityData, b: CityData) => b.casos - a.casos)
+                    .slice(0, 15); // Pegar apenas as 15 cidades com mais casos
+
+                const labels = sortedCities.map(city => city.city);
+                const casos = sortedCities.map(city => city.casos);
+                const backgroundColors = sortedCities.map(city => getAlertColor(city.nivel));
+
                 setChartData({
                     labels: labels,
                     datasets: [
                         {
-                            label: "Casos na 1ª semana",
+                            label: "Casos na Última Semana",
                             data: casos,
-                            backgroundColor: "rgba(75, 192, 192, 0.6)",
-                            borderColor: "rgba(75, 192, 192, 1)",
+                            backgroundColor: backgroundColors,
+                            borderColor: backgroundColors.map(color => color.replace("0.6", "1")),
                             borderWidth: 1
                         }
                     ]
@@ -62,19 +70,48 @@ export default function BarChart() {
         }
 
         fetchData();
-    }, []); // ✅ O `useEffect` roda apenas uma vez ao montar o componente
+    }, []);
+
+    // Função para definir cores com base no nível de alerta
+    const getAlertColor = (nivel: number) => {
+        switch (nivel) {
+            case 1: return "rgba(75, 192, 192, 0.6)"; // Verde (baixo risco)
+            case 2: return "rgba(255, 206, 86, 0.6)"; // Amarelo (médio risco)
+            case 3: return "rgba(255, 159, 64, 0.6)"; // Laranja (alto risco)
+            case 4: return "rgba(255, 99, 132, 0.6)"; // Vermelho (alerta máximo)
+            default: return "rgba(200, 200, 200, 0.6)"; // Cinza (desconhecido)
+        }
+    };
 
     return (
         <div className="w-full max-w-2xl mx-auto p-4">
-            <h2 className="text-xl font-bold text-center mb-4">Casos por Cidade</h2>
-            <div className="h-[400px] w-full">
+            <h2 className="text-xl font-bold text-center mb-4">{chartTitle}</h2>
+            <div className="chart-container">
                 <Bar
                     data={chartData}
                     options={{
                         responsive: true,
                         maintainAspectRatio: false,
+                        indexAxis: "y", // Mantém gráfico vertical
                         scales: {
-                            y: { beginAtZero: true }
+                            x: {
+                                beginAtZero: true,
+                                ticks: {
+                                    font: { size: 14 }
+                                }
+                            },
+                            y: {
+                                ticks: {
+                                    font: { size: 12 },
+                                    autoSkip: false // Garante que todos os nomes das cidades apareçam
+                                }
+                            }
+                        },
+                        plugins: {
+                            legend: {
+                                display: true,
+                                position: "top"
+                            }
                         }
                     }}
                 />

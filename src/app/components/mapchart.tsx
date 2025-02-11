@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { Chart as ChartJS, Tooltip, Legend } from "chart.js";
+import { Chart as ChartJS, Tooltip, TooltipItem, ChartOptions, Legend } from "chart.js";
 import {
   ChoroplethController,
   ProjectionScale,
@@ -38,18 +38,20 @@ interface GeoFeatureCollection {
 interface CityData {
   city: string;
   geocode: number;
-  pop: number;
-  data: {
-    SE: number;
-    casos_est: number;
-    casos: number;
-    nivel: number;
-  }[];
+  casos: number;
+  nivel: number;
+}
+
+interface StateData {
+  total_week_cases: number;
+  total_pop: number;
+  cities_in_alert_state: number;
+  cities: CityData[];
 }
 
 const MapChart: React.FC = () => {
   const [geoData, setGeoData] = useState<GeoFeatureCollection | null>(null);
-  const [citiesData, setCitiesData] = useState<CityData[]>([]);
+  const [stateData, setStateData] = useState<StateData | null>(null);
 
   // Carregar o GeoJSON de Minas Gerais
   useEffect(() => {
@@ -61,17 +63,17 @@ const MapChart: React.FC = () => {
       .catch((error) => console.error("Erro ao carregar o GeoJSON:", error));
   }, []);
 
-  // Carregar os dados das cidades do MongoDB
+  // Carregar os dados do estado (última semana) do MongoDB
   useEffect(() => {
-    fetch("/api/cities")
+    fetch("/api/state")
       .then((response) => response.json())
       .then((data) => {
-        setCitiesData(data);
+        setStateData(data);
       })
-      .catch((error) => console.error("Erro ao carregar dados das cidades:", error));
+      .catch((error) => console.error("Erro ao carregar dados do estado:", error));
   }, []);
 
-  if (!geoData || citiesData.length === 0) {
+  if (!geoData || !stateData) {
     return <div>Carregando mapa...</div>;
   }
 
@@ -91,26 +93,29 @@ const MapChart: React.FC = () => {
     }
   };
 
+  // Criar um Map para busca eficiente
+  const citiesMap = new Map<number, CityData>();
+  stateData.cities.forEach((city) => {
+    citiesMap.set(city.geocode, city);
+  });
+
   const data = {
     labels: geoData.features.map((feature) => feature.properties.name),
     datasets: [
       {
         label: "Municípios de Minas Gerais",
         data: geoData.features.map((feature) => {
-          // Converter ambos os valores para números para garantir a correspondência
-          const city = citiesData.find((c) => c.geocode === Number(feature.properties.id));
-
-          const latestData = city ? city.data[0] : null; // Pega os dados da semana mais recente
+          const city = citiesMap.get(Number(feature.properties.id));
           return {
             feature,
-            value: latestData ? latestData.nivel : 0, // Usa o nível como valor
-            casos: latestData ? latestData.casos : 0, // Número de casos para o tooltip
+            value: city ? city.nivel : 0, // Usa o nível como valor
+            casos: city ? city.casos : 0, // Número de casos para o tooltip
           };
         }),
         outline: geoData.features,
         backgroundColor: geoData.features.map((feature) => {
-          const city = citiesData.find((c) => c.geocode === Number(feature.properties.id));
-          const nivel = city ? city.data[0].nivel : 1; // Nível da semana mais recente
+          const city = citiesMap.get(Number(feature.properties.id));
+          const nivel = city ? city.nivel : 1; // Nível da semana mais recente
           return getColorByNivel(nivel);
         }),
         borderColor: "rgba(0, 0, 0, 1)", // Bordas pretas
@@ -120,12 +125,13 @@ const MapChart: React.FC = () => {
   };
 
   // Configurações do gráfico
-  const options = {
+  const options: ChartOptions<"choropleth"> = {
     responsive: true,
     maintainAspectRatio: false,
     scales: {
       projection: {
         axis: "x",
+        type: "projection",
         projection: "mercator", // Usar Mercator
       },
     },
@@ -135,11 +141,10 @@ const MapChart: React.FC = () => {
       },
       tooltip: {
         callbacks: {
-          label: (context: any) => {
-            const feature = context.raw.feature;
-            const city = citiesData.find((c) => c.geocode === Number(feature.properties.id));
-            const latestData = city ? city.data[0] : null;
-            return `${feature.properties.name}: ${latestData ? latestData.casos : 0} casos`;
+          label: (context: TooltipItem<"choropleth">) => {
+            const feature = (context.raw as { feature: GeoFeature }).feature;
+            const city = citiesMap.get(Number(feature.properties.id));
+            return `${feature.properties.name}: ${city ? city.casos : 0} casos`;
           },
         },
       },

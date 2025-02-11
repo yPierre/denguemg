@@ -27,3 +27,8 @@ a {
 }
 
 
+.chart-container {
+  min-height: 600px; /* Define uma altura mínima */
+  max-width: 500px; /* Impede que fique muito largo */
+  margin: 0 auto; /* Centraliza */
+}
