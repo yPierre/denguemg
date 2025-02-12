@@ -8,7 +8,7 @@ export async function GET() {
         const db = client.db("denguemg");
 
         // Busca os dados agregados do estado
-        const stateData = await db.collection("state").findOne();
+        const stateData = await db.collection("state").find().toArray();
 
         if (!stateData) {
             return NextResponse.json({ error: "Dados do estado não encontrados" }, { status: 404 });

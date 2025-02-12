@@ -68,7 +68,12 @@ const MapChart: React.FC = () => {
     fetch("/api/state")
       .then((response) => response.json())
       .then((data) => {
-        setStateData(data);
+        // Usar apenas o primeiro elemento do array, que contém os dados das cidades
+        if (Array.isArray(data) && data.length > 0) {
+          setStateData(data[0]);
+        } else {
+          console.error("Dados inválidos ou vazios:", data);
+        }
       })
       .catch((error) => console.error("Erro ao carregar dados do estado:", error));
   }, []);

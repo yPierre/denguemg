@@ -32,3 +32,8 @@ a {
   max-width: 500px; /* Impede que fique muito largo */
   margin: 0 auto; /* Centraliza */
 }
+
+.chart-container2 {
+  min-height: 300px; /* Define uma altura mínima */
+  margin: 0 auto; /* Centraliza */
+}
