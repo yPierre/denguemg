@@ -2,9 +2,18 @@
 
 import { useEffect, useState } from "react";
 import { Bar } from "react-chartjs-2";
-import { Chart, ChartDataset, BarElement, CategoryScale, LinearScale, Tooltip, Legend } from "chart.js";
+import {
+  Chart,
+  ChartDataset,
+  BarElement,
+  CategoryScale,
+  LinearScale,
+  Tooltip,
+  Legend,
+} from "chart.js";
+import ChartDataLabels from "chartjs-plugin-datalabels"; // Importe o plugin
 
-// Registrar componentes do Chart.js
+// Registrar componentes do Chart.js (exceto o plugin datalabels)
 Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 // Tipagem dos dados vindos da API
@@ -101,38 +110,48 @@ export default function BarChart2() {
   };
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-4">
-      <h2 className="text-xl font-bold text-center mb-4">{chartTitle}</h2>
-      <div className="chart-container">
-        <Bar
-          data={chartData}
-          options={{
-            responsive: true,
-            maintainAspectRatio: false,
-            indexAxis: "y", // Mantém gráfico vertical
-            scales: {
-              x: {
-                beginAtZero: true,
-                ticks: {
-                  font: { size: 14 },
-                },
-              },
-              y: {
-                ticks: {
-                  font: { size: 12 },
-                  autoSkip: false, // Garante que todos os nomes das cidades apareçam
-                },
+    <div className="barchart-container">
+      {/*<h2 className="text-xl font-bold text-center mb-4">{chartTitle}</h2> RESOLVER ISSO DEPOIS*/}
+      <Bar
+        data={chartData}
+        plugins={[ChartDataLabels]} // Aplica o plugin apenas a este gráfico
+        options={{
+          responsive: true,
+          maintainAspectRatio: false,
+          indexAxis: "y", // Mantém gráfico vertical
+          scales: {
+            x: {
+              beginAtZero: true,
+              ticks: {
+                font: { size: 14 },
               },
             },
-            plugins: {
-              legend: {
-                display: true,
-                position: "top",
-              },
+            y: {
+              display: false, // Remove os ticks do eixo Y (labels antigas)
             },
-          }}
-        />
-      </div>
+          },
+          plugins: {
+            legend: {
+              display: false, // Remove a legenda (não é mais necessária)
+            },
+            datalabels: {
+              // Configuração dos rótulos
+              anchor: "start", // Posiciona o rótulo no início da barra
+              align: "end", // Alinha o rótulo ao final da barra
+              color: "black", // Cor do texto
+              font: {
+                size: 12,
+                weight: "bold",
+              },
+              formatter: (value, context) => {
+                // Exibe o nome da cidade e o número de casos
+                return `${context.chart.data.labels[context.dataIndex]}: ${value}`;
+              },
+              offset: 10, // Ajusta a distância do rótulo em relação à barra
+            },
+          },
+        }}
+      />
     </div>
   );
 }

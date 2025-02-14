@@ -89,7 +89,7 @@ export default function LineChart() {
       console.log(`🎨 Criando dataset para o ano ${year}, dados:`, cases);
 
       return {
-        label: `Ano ${year}`,
+        label: `${year}`,
         data: cases,
         fill: false,
         borderColor: colors[index % colors.length], // Usa a paleta de cores
@@ -116,7 +116,7 @@ export default function LineChart() {
 
       {chartData ? (
         <div className="h-[400px] w-full">
-            <div className="chart-container2">
+            <div className="linechart-container">
                 <Line
                     data={chartData}
                     options={{

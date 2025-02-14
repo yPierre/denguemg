@@ -20,6 +20,7 @@ ChartJS.register(
   Legend
 );
 
+
 // Definindo tipos para os dados geoespaciais
 interface GeoFeature {
   type: string;
@@ -98,6 +99,13 @@ const MapChart: React.FC = () => {
     }
   };
 
+  const legendItems = [
+    { label: "Baixo", color: "rgba(0, 255, 0, 0.5)" },
+    { label: "Médio", color: "rgba(255, 255, 0, 0.5)" },
+    { label: "Alto", color: "rgba(255, 165, 0, 0.5)" },
+    { label: "Crítico", color: "rgba(255, 0, 0, 0.5)" },
+  ];
+
   // Criar um Map para busca eficiente
   const citiesMap = new Map<number, CityData>();
   stateData.cities.forEach((city) => {
@@ -131,33 +139,43 @@ const MapChart: React.FC = () => {
 
   // Configurações do gráfico
   const options: ChartOptions<"choropleth"> = {
-    responsive: true,
-    maintainAspectRatio: false,
-    scales: {
-      projection: {
-        axis: "x",
-        type: "projection",
-        projection: "mercator", // Usar Mercator
-      },
+  responsive: true,
+  maintainAspectRatio: false,
+  scales: {
+    projection: {
+      axis: "x",
+      type: "projection",
+      projection: "mercator", // Usar Mercator
     },
-    plugins: {
-      legend: {
-        display: true, // Exibe a legenda
-      },
-      tooltip: {
-        callbacks: {
-          label: (context: TooltipItem<"choropleth">) => {
-            const feature = (context.raw as { feature: GeoFeature }).feature;
-            const city = citiesMap.get(Number(feature.properties.id));
-            return `${feature.properties.name}: ${city ? city.casos : 0} casos`;
-          },
+  },
+  plugins: {
+    legend: {
+      display: true,
+      labels: {
+        generateLabels: (chart) => {
+          return legendItems.map((item) => ({
+            text: item.label,
+            fillStyle: item.color,
+            strokeStyle: item.color,
+            lineWidth: 1,
+          }));
         },
       },
     },
-  };
+    tooltip: {
+      callbacks: {
+        label: (context: TooltipItem<"choropleth">) => {
+          const feature = (context.raw as { feature: GeoFeature }).feature;
+          const city = citiesMap.get(Number(feature.properties.id));
+          return `${feature.properties.name}: ${city ? city.casos : 0} casos`;
+        },
+      },
+    },
+  },
+};
 
   return (
-    <div style={{ width: "100%", height: "800px" }}>
+    <div className="map-container">
       <Chart type="choropleth" data={data} options={options} />
     </div>
   );
