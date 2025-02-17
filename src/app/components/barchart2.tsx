@@ -112,6 +112,7 @@ export default function BarChart2() {
   return (
     <div className="barchart-container">
       {/*<h2 className="text-xl font-bold text-center mb-4">{chartTitle}</h2> RESOLVER ISSO DEPOIS*/}
+      <div className="barchart-wrapper">
       <Bar
         data={chartData}
         plugins={[ChartDataLabels]} // Aplica o plugin apenas a este gráfico
@@ -127,6 +128,8 @@ export default function BarChart2() {
               },
             },
             y: {
+              min: -10,
+              max: 10,
               display: false, // Remove os ticks do eixo Y (labels antigas)
             },
           },
@@ -152,6 +155,7 @@ export default function BarChart2() {
           },
         }}
       />
+      </div>
     </div>
   );
 }

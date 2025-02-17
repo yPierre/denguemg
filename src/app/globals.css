@@ -20,23 +20,18 @@ body {
   grid-template-columns: 250px 1fr;
   grid-template-rows: 1fr;
   gap: 16px;
-  width: 90vw;
-  height: 90vh;
+  width: 95vw;
+  height: 95vh;
 }
 
-/* Sidebar */
+/* Sidebar deve ocupar toda a altura da tela sem empurrar o conteúdo */
 .sidebar {
   grid-area: sidebar;
   display: flex;
   flex-direction: column;
   gap: 16px;
-}
-
-/* KPI */
-.kpi-container {
-  background-color: #eee;
-  padding: 16px;
-  text-align: center;
+  height: 100%; /* Ocupa toda a altura do grid */
+  overflow: hidden; /* Garante que o scroll fique apenas no gráfico */
 }
 
 /* Barra de busca */
@@ -48,11 +43,16 @@ body {
 
 /* Gráfico de barras ocupando todo o espaço disponível abaixo */
 .barchart-container {
-  flex-grow: 1;
+  flex-grow: 1; /* Ocupa todo o espaço restante na sidebar */
+  height: 500px;
   display: flex;
-  align-items: center;
-  justify-content: center;
+  flex-direction: column;
   background-color: #f0f0f0;
+  overflow: hidden; /* Impede que o conteúdo estoure para fora */
+}
+
+.barchart-wrapper {
+  flex-grow: 1;
 }
 
 /* Bloco direito */
@@ -139,19 +139,6 @@ body {
   border-radius: 4px;
 }
 
-/* Gráfico de barras - Agora ocupa toda a altura disponível */
-.barchart-container {
-  flex-grow: 1; /* Ocupa o espaço restante */
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  background-color: #f0f0f0;
-  min-height: 0;
-  height: 100%;
-}
-
-
-
 /* Bloco direito */
 .content {
   grid-area: content;
@@ -176,6 +163,7 @@ body {
   justify-content: center;
   background-color: #f9f9f9;
 }
+
 
 /* Responsividade */
 @media (max-width: 1024px) {

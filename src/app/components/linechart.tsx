@@ -112,7 +112,7 @@ export default function LineChart() {
 
   return (
     <div className="w-full max-w-3xl mx-auto p-4">
-      <h2 className="text-xl font-bold text-center mb-4">Casos Semanais por Ano</h2>
+      <h3 className="linechart-title">Casos Semanais por Ano</h3>
 
       {chartData ? (
         <div className="h-[400px] w-full">
