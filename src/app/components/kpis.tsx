@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React from "react";
+import { useDataStore } from "@/store/dataStore"; // Importa o estado global
 
 // Definindo tipos para os dados do estado
 interface StateData {
@@ -16,22 +17,9 @@ interface StateData {
 }
 
 const KPI: React.FC = () => {
-  const [stateData, setStateData] = useState<StateData | null>(null);
+  const { stateData } = useDataStore(); // Pega os dados do estado global
 
-  // Carregar os dados do estado (última semana) do MongoDB
-  useEffect(() => {
-    fetch("/api/state")
-      .then((response) => response.json())
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) {
-          setStateData(data[0]);
-        } else {
-          console.error("Dados inválidos ou vazios:", data);
-        }
-      })
-      .catch((error) => console.error("Erro ao carregar dados do estado:", error));
-  }, []);
-
+  // Verificar se os dados necessários estão disponíveis
   if (!stateData) {
     return <div>Carregando KPIs...</div>;
   }
@@ -49,25 +37,25 @@ const KPI: React.FC = () => {
       <div style={styles.grid}>
         {/* Últimos 7 dias */}
         <div style={styles.item}>
-          <p style={styles.value}>{stateData.total_week_cases}</p>
+          <p style={styles.value}>{stateData[0].total_week_cases.toLocaleString("pt-BR")}</p>
           <p style={styles.subtitle}>Últimos 7 dias</p>
         </div>
 
         {/* Últimos 30 dias */}
         <div style={styles.item}>
-          <p style={styles.value}>{last30DaysCases}</p>
+          <p style={styles.value}>{last30DaysCases.toLocaleString("pt-BR")}</p>
           <p style={styles.subtitle}>Últimos 30 dias</p>
         </div>
 
         {/* Acumulado no ano */}
         <div style={styles.item}>
-          <p style={styles.value}>{yearlyCases}</p>
+          <p style={styles.value}>{yearlyCases.toLocaleString("pt-BR")}</p>
           <p style={styles.subtitle}>Acumulado</p>
         </div>
 
         {/* Cidades em nível de alerta */}
         <div style={styles.item}>
-          <p style={styles.value}>{stateData.cities_in_alert_state}</p>
+          <p style={styles.value}>{stateData[0].cities_in_alert_state}</p>
           <p style={styles.subtitle}>Cidades em nível de alerta</p>
         </div>
       </div>

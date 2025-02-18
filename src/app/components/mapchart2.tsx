@@ -1,8 +1,23 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
+import dynamic from "next/dynamic"; // Importe o dynamic do Next.js
 import "leaflet/dist/leaflet.css";
+import { useDataStore } from "@/store/dataStore"; // Importa o estado global
+
+// Carregue o MapContainer dinamicamente, desativando SSR
+const MapContainer = dynamic(
+  () => import("react-leaflet").then((mod) => mod.MapContainer),
+  { ssr: false }
+);
+const TileLayer = dynamic(
+  () => import("react-leaflet").then((mod) => mod.TileLayer),
+  { ssr: false }
+);
+const GeoJSON = dynamic(
+  () => import("react-leaflet").then((mod) => mod.GeoJSON),
+  { ssr: false }
+);
 
 // Definindo tipos para os dados geoespaciais
 interface GeoFeature {
@@ -35,7 +50,7 @@ interface StateData {
 
 const MapChart2: React.FC = () => {
   const [geoData, setGeoData] = useState<GeoFeatureCollection | null>(null);
-  const [stateData, setStateData] = useState<StateData | null>(null);
+  const { stateData } = useDataStore(); // Pega os dados do estado global
 
   // Carregar o GeoJSON de Minas Gerais
   useEffect(() => {
@@ -45,20 +60,6 @@ const MapChart2: React.FC = () => {
         setGeoData(data);
       })
       .catch((error) => console.error("Erro ao carregar o GeoJSON:", error));
-  }, []);
-
-  // Carregar os dados do estado (última semana) do MongoDB
-  useEffect(() => {
-    fetch("/api/state")
-      .then((response) => response.json())
-      .then((data) => {
-        if (Array.isArray(data) && data.length > 0) {
-          setStateData(data[0]);
-        } else {
-          console.error("Dados inválidos ou vazios:", data);
-        }
-      })
-      .catch((error) => console.error("Erro ao carregar dados do estado:", error));
   }, []);
 
   if (!geoData || !stateData) {
@@ -83,7 +84,7 @@ const MapChart2: React.FC = () => {
 
   // Mapear os dados das cidades para o GeoJSON
   const citiesMap = new Map<number, CityData>();
-  stateData.cities.forEach((city) => {
+  stateData[0].cities.forEach((city) => {
     citiesMap.set(city.geocode, city);
   });
 

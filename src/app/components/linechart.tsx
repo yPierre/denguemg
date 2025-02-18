@@ -11,55 +11,30 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import { useDataStore } from "@/store/dataStore"; // Importa o estado global
 
 // Registrar componentes do Chart.js
 Chart.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
 
-// Tipagem dos dados
-interface StateData {
-  SE: number;
-  total_week_cases: number;
-}
-
 export default function LineChart() {
-  const [stateData, setStateData] = useState<StateData[]>([]);
+  const { stateData } = useDataStore(); // Pega os dados do estado global
   const [chartData, setChartData] = useState<any>(null);
 
+  // Processa os dados para o gráfico
   useEffect(() => {
-    async function fetchData() {
-      try {
-        console.log("🔄 Buscando dados da API...");
-
-        const response = await fetch("/api/state");
-        const data: StateData[] = await response.json();
-
-        console.log("✅ Dados recebidos da API:", data);
-
-        if (!Array.isArray(data) || data.length === 0) {
-          console.error("❌ Dados inválidos ou lista vazia:", data);
-          return;
-        }
-
-        setStateData(data);
-      } catch (error) {
-        console.error("❌ Erro ao buscar os dados:", error);
-      }
-    }
-
-    fetchData();
-  }, []);
-
-  useEffect(() => {
-    if (stateData.length === 0) {
-      console.log("⚠️ Nenhum dado carregado ainda...");
-      return;
-    }
+    if (!stateData) return;
 
     console.log("📊 Processando dados recebidos...");
 
+    // Extrair os dados de semanas epidemiológicas (SE) e casos
+    const seData = stateData.map((entry: any) => ({
+      SE: entry.SE,
+      total_week_cases: entry.total_week_cases,
+    }));
+
     // Agrupar dados por ano
     const groupedData: { [year: number]: number[] } = {};
-    stateData.forEach(({ SE, total_week_cases }) => {
+    seData.forEach(({ SE, total_week_cases }) => {
       const year = Math.floor(SE / 100); // Ex: 202452 -> 2024
       const week = SE % 100; // Ex: 202452 -> 52
 
@@ -108,7 +83,12 @@ export default function LineChart() {
       labels: Array.from({ length: 52 }, (_, i) => i + 1), // Semanas de 1 a 52
       datasets,
     });
-  }, [stateData]);
+  }, [stateData]); // Atualiza o gráfico sempre que `stateData` mudar
+
+  // Exibe um indicador de carregamento enquanto os dados estão sendo buscados
+  if (!stateData) {
+    return <p className="text-center">⏳ Carregando dados...</p>;
+  }
 
   return (
     <div className="w-full max-w-3xl mx-auto p-4">
@@ -116,52 +96,52 @@ export default function LineChart() {
 
       {chartData ? (
         <div className="h-[400px] w-full">
-            <div className="linechart-container">
-                <Line
-                    data={chartData}
-                    options={{
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    interaction: {
-                        mode: "index", // Permite interagir com múltiplos datasets ao mesmo tempo
-                        intersect: false, // Exibe o tooltip ao passar o mouse sobre a linha
-                    },
-                    scales: {
-                        x: {
-                        title: { display: true, text: "Semana Epidemiológica" },
-                        },
-                        y: {
-                        beginAtZero: true,
-                        title: { display: true, text: "Casos" },
-                        },
-                    },
-                    plugins: {
-                        legend: {
-                        onClick: (e, legendItem, legend) => {
-                            const index = legendItem.datasetIndex;
-                            if (index === undefined) return;
+          <div className="linechart-container">
+            <Line
+              data={chartData}
+              options={{
+                responsive: true,
+                maintainAspectRatio: false,
+                interaction: {
+                  mode: "index", // Permite interagir com múltiplos datasets ao mesmo tempo
+                  intersect: false, // Exibe o tooltip ao passar o mouse sobre a linha
+                },
+                scales: {
+                  x: {
+                    title: { display: true, text: "Semana Epidemiológica" },
+                  },
+                  y: {
+                    beginAtZero: true,
+                    title: { display: true, text: "Casos" },
+                  },
+                },
+                plugins: {
+                  legend: {
+                    onClick: (e, legendItem, legend) => {
+                      const index = legendItem.datasetIndex;
+                      if (index === undefined) return;
 
-                            const chart = legend.chart;
-                            const meta = chart.getDatasetMeta(index);
-                            meta.hidden = !meta.hidden;
+                      const chart = legend.chart;
+                      const meta = chart.getDatasetMeta(index);
+                      meta.hidden = !meta.hidden;
 
-                            chart.update();
-                        },
-                        },
-                        tooltip: {
-                        callbacks: {
-                            title: (context) => `Semana ${context[0].label}`, // Título do tooltip
-                            label: (context) => {
-                            const datasetLabel = context.dataset.label || "";
-                            const value = context.raw;
-                            return `${datasetLabel}: ${value} casos`;
-                            },
-                        },
-                        },
+                      chart.update();
                     },
-                    }}
-                />
-            </div>
+                  },
+                  tooltip: {
+                    callbacks: {
+                      title: (context) => `Semana ${context[0].label}`, // Título do tooltip
+                      label: (context) => {
+                        const datasetLabel = context.dataset.label || "";
+                        const value = context.raw;
+                        return `${datasetLabel}: ${value} casos`;
+                      },
+                    },
+                  },
+                },
+              }}
+            />
+          </div>
         </div>
       ) : (
         <p className="text-center">⏳ Carregando dados...</p>

@@ -1,14 +1,19 @@
-import BarChart from "@/app/components/barchart2";
-import LineChart from "../components/linechart";
-import MapChart from "../components/mapchart2";
-import KPI from "../components/kpis";
-import { Metadata } from 'next';
+"use client";
 
-export const metadata: Metadata = {
-  title: 'DengueMG',
-};
+import { useEffect } from "react";
+import { useDataStore } from "@/store/dataStore";
+import BarChart from "@/app/components/barchart2";
+import KPI from "@/app/components/kpis";
+import MapChart from "../components/mapchart2";
+import LineChart from "../components/linechart";
 
 export default function Page() {
+  const { fetchStateData } = useDataStore();
+
+  useEffect(() => {
+    fetchStateData(); // Busca os dados do estado ao carregar a página
+  }, [fetchStateData]);
+
   return (
     <main className="container">
       {/* Sidebar (esquerda) */}
