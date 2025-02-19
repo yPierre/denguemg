@@ -15,21 +15,24 @@ export default function Page() {
   }, [fetchStateData]);
 
   return (
-    <main className="container">
-      {/* Sidebar (esquerda) */}
-      <aside className="sidebar">
-        <div className="kpi-container">
-          <KPI/>
-        </div>
-        <input type="text" placeholder="Buscar cidade..." className="search-bar" />
-        <BarChart />
-      </aside>
+    <main className="main-container">
+      <header className="header">DengueMG - Dashboard de Dengue</header>
+      <div className="container">
+        {/* Sidebar (esquerda) */}
+        <aside className="sidebar">
+          <div className="kpi-container">
+            <KPI />
+          </div>
+          <input type="text" placeholder="Buscar cidade..." className="search-bar" />
+          <BarChart />
+        </aside>
 
-      {/* Conteúdo principal (direita) */}
-      <section className="content">
-        <MapChart />
-        <LineChart />
-      </section>
+        {/* Conteúdo principal (direita) */}
+        <section className="content">
+          <MapChart />
+          <LineChart />
+        </section>
+      </div>
     </main>
   );
 }

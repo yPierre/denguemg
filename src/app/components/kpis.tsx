@@ -3,18 +3,10 @@
 import React from "react";
 import { useDataStore } from "@/store/dataStore"; // Importa o estado global
 
-// Definindo tipos para os dados do estado
-interface StateData {
-  total_week_cases: number;
-  total_pop: number;
-  cities_in_alert_state: number;
-  cities: {
-    city: string;
-    geocode: number;
-    casos: number;
-    nivel: number;
-  }[];
-}
+// Função para formatar números (ex: 1000 -> 1.000)
+const formatNumber = (num: number): string => {
+  return num.toLocaleString("pt-BR");
+};
 
 const KPI: React.FC = () => {
   const { stateData } = useDataStore(); // Pega os dados do estado global
@@ -29,74 +21,40 @@ const KPI: React.FC = () => {
   const yearlyCases = 12000; // Exemplo: 12000 casos acumulados no ano
 
   return (
-    <div style={styles.container}>
+    <div className="kpi-container">
       {/* Título principal */}
-      <h2 style={styles.mainTitle}>CASOS CONFIRMADOS</h2>
+      <h2 className="kpi-main-title">CASOS CONFIRMADOS</h2>
 
       {/* Valores e descrições */}
-      <div style={styles.grid}>
+      <div className="kpi-grid">
         {/* Últimos 7 dias */}
-        <div style={styles.item}>
-          <p style={styles.value}>{stateData[0].total_week_cases.toLocaleString("pt-BR")}</p>
-          <p style={styles.subtitle}>Últimos 7 dias</p>
+        <div className="kpi-item">
+          <p className="kpi-value">{formatNumber(stateData[0].total_week_cases)}</p>
+          <p className="kpi-subtitle">Últimos 7 dias</p>
         </div>
 
         {/* Últimos 30 dias */}
-        <div style={styles.item}>
-          <p style={styles.value}>{last30DaysCases.toLocaleString("pt-BR")}</p>
-          <p style={styles.subtitle}>Últimos 30 dias</p>
+        <div className="kpi-item">
+          <p className="kpi-value">{formatNumber(last30DaysCases)}</p>
+          <p className="kpi-subtitle">Últimos 30 dias</p>
         </div>
 
         {/* Acumulado no ano */}
-        <div style={styles.item}>
-          <p style={styles.value}>{yearlyCases.toLocaleString("pt-BR")}</p>
-          <p style={styles.subtitle}>Acumulado</p>
+        <div className="kpi-item">
+          <p className="kpi-value">{formatNumber(yearlyCases)}</p>
+          <p className="kpi-subtitle">Acumulado</p>
         </div>
 
         {/* Cidades em nível de alerta */}
-        <div style={styles.item}>
-          <p style={styles.value}>{stateData[0].cities_in_alert_state}</p>
-          <p style={styles.subtitle}>Cidades em nível de alerta</p>
+        <div className="kpi-item">
+          <p className="kpi-value kpi-alert-value">
+            {formatNumber(stateData[0].cities_in_alert_state)}
+          </p>
+          <p className="kpi-subtitle">Cidades em nível de alerta</p>
         </div>
       </div>
     </div>
   );
-};
-
-// Estilos para o componente
-const styles = {
-  container: {
-    padding: "5px",
-    backgroundColor: "#f5f5f5",
-    borderRadius: "10px",
-    maxWidth: "600px", // Largura máxima para ocupar menos espaço
-    margin: "0 auto", // Centralizar na tela
-  },
-  mainTitle: {
-    fontSize: "16px",
-    fontWeight: "bold",
-    color: "#333",
-    textAlign: "center" as "center",
-  },
-  grid: {
-    display: "grid",
-    gridTemplateColumns: "repeat(2, 1fr)", // 2 colunas
-    gap: "20px",
-  },
-  item: {
-    textAlign: "center" as "center",
-  },
-  value: {
-    fontSize: "24px",
-    fontWeight: "bold",
-    color: "#000000",
-    margin: "0",
-  },
-  subtitle: {
-    fontSize: "14px",
-    color: "#666",
-    margin: "5px 0 0 0",
-  },
 };
 
 export default KPI;

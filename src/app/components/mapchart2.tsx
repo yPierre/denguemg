@@ -1,23 +1,9 @@
 "use client";
 
 import React, { useEffect, useState } from "react";
-import dynamic from "next/dynamic"; // Importe o dynamic do Next.js
+import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useDataStore } from "@/store/dataStore"; // Importa o estado global
-
-// Carregue o MapContainer dinamicamente, desativando SSR
-const MapContainer = dynamic(
-  () => import("react-leaflet").then((mod) => mod.MapContainer),
-  { ssr: false }
-);
-const TileLayer = dynamic(
-  () => import("react-leaflet").then((mod) => mod.TileLayer),
-  { ssr: false }
-);
-const GeoJSON = dynamic(
-  () => import("react-leaflet").then((mod) => mod.GeoJSON),
-  { ssr: false }
-);
 
 // Definindo tipos para os dados geoespaciais
 interface GeoFeature {
@@ -49,8 +35,9 @@ interface StateData {
 }
 
 const MapChart2: React.FC = () => {
-  const [geoData, setGeoData] = useState<GeoFeatureCollection | null>(null);
   const { stateData } = useDataStore(); // Pega os dados do estado global
+  const [geoData, setGeoData] = useState<GeoFeatureCollection | null>(null);
+  const [selectedCity, setSelectedCity] = useState<CityData | null>(null); // Estado para a cidade selecionada
 
   // Carregar o GeoJSON de Minas Gerais
   useEffect(() => {
@@ -101,14 +88,24 @@ const MapChart2: React.FC = () => {
     };
   };
 
-  // Tooltip para cada município
+  // Tooltip e evento de clique para cada município
   const onEachFeature = (feature: GeoFeature, layer: L.Layer) => {
     const city = citiesMap.get(Number(feature.properties.id));
+
     if (city) {
+      // Tooltip
       layer.bindTooltip(
         `<strong>${feature.properties.name}</strong><br>Casos: ${city.casos}`,
         { permanent: false, sticky: true }
       );
+
+      // Evento de clique
+      layer.on("click", () => {
+        setSelectedCity(city); // Armazena a cidade selecionada
+        const map = layer._map; // Acessa o mapa
+        const bounds = layer.getBounds(); // Obtém os limites da cidade
+        map.flyToBounds(bounds, { padding: [5, 5], maxZoom: 7 }); // Dá zoom na cidade
+      });
     }
   };
 
@@ -123,14 +120,21 @@ const MapChart2: React.FC = () => {
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
           attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
         />
-        {geoData && (
+        {stateData && (
           <GeoJSON
-            data={geoData}
+            data={geoData} // Certifique-se de que geoData está no stateData
             style={styleFeature}
             onEachFeature={onEachFeature}
           />
         )}
       </MapContainer>
+
+      {/* Exibe a cidade selecionada (para teste) */}
+      {selectedCity && (
+        <div style={{ marginTop: "10px", textAlign: "center" }}>
+          <strong>Cidade selecionada:</strong> {selectedCity.city} (Casos: {selectedCity.casos})
+        </div>
+      )}
     </div>
   );
 };

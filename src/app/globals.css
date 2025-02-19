@@ -12,6 +12,7 @@ body {
   height: 100vh;
 }
 
+
 .container {
   display: grid;
   grid-template-areas:
@@ -48,11 +49,107 @@ body {
   display: flex;
   flex-direction: column;
   background-color: #f0f0f0;
-  overflow: hidden; /* Impede que o conteúdo estoure para fora */
+  overflow: hidden;
 }
 
 .barchart-wrapper {
   flex-grow: 1;
+  overflow-x: auto; /* Adiciona barra de rolagem horizontal se necessário */
+  overflow-y: hidden; /* Evita alteração na espessura das barras */
+  padding-bottom: 10px; /* Evita que a barra de rolagem encoste no gráfico */
+}
+
+
+/* Bloco direito */
+.content {
+  grid-area: content;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+/* Mapa */
+.map-container {
+  flex-grow: 2; /* Ocupa a maior parte do bloco direito */
+  min-height: 350px;
+}
+
+/* Gráfico de linhas */
+.linechart-container {
+  flex-grow: 1; /* Ocupa o restante da altura */
+  min-height: 300px;
+}
+
+/* KPI */
+/* Estilos para o componente KPI */
+.kpi-container {
+  padding: 5px;
+  background-color: #f5f5f5;
+  border-radius: 10px;
+  max-width: 600px; /* Largura máxima para ocupar menos espaço */
+  margin: 0 auto; /* Centralizar na tela */
+}
+
+.kpi-main-title {
+  font-size: 16px;
+  font-weight: bold;
+  color: #444;
+  text-align: center;
+}
+
+.kpi-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr); /* 2 colunas */
+  gap: 20px;
+}
+
+.kpi-item {
+  text-align: center;
+}
+
+.kpi-value {
+  font-size: 24px;
+  font-weight: bold;
+  color: #000000;
+  margin: 0;
+}
+
+.kpi-subtitle {
+  font-size: 14px;
+  color: #666;
+  margin: 5px 0 0 0;
+}
+
+/* Cor específica para o número de cidades em alerta */
+.kpi-alert-value {
+  color: #00bfff; /* Azul claro */
+}
+
+/* Header */
+.header {
+  padding: 16px;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  color: #000000;
+  background-color: #00bfff;
+}
+
+
+/* Sidebar (esquerda) */
+.sidebar {
+  grid-area: sidebar;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  height: 100%; /* Garante que ocupe toda a altura disponível */
+}
+
+/* Barra de busca */
+.search-bar {
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 /* Bloco direito */
@@ -67,13 +164,19 @@ body {
 .map-container {
   flex-grow: 2; /* Ocupa a maior parte do bloco direito */
   min-height: 400px;
+  
 }
 
-/* Gráfico de linhas */
+/* Gráfico de linhas agora ocupa todo o espaço disponível abaixo do mapa */
 .linechart-container {
-  flex-grow: 1; /* Ocupa o restante da altura */
-  min-height: 300px;
+  flex-grow: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #f9f9f9;
 }
+
+
 
 /* Responsividade */
 @media (max-width: 1024px) {
@@ -91,6 +194,8 @@ body {
   height: 100vh;
 }
 
+
+
 /* Header */
 .header {
   width: 100%;
@@ -101,19 +206,6 @@ body {
   background-color: #ddd;
 }
 
-/* Layout principal */
-.container {
-  display: grid;
-  grid-template-areas:
-    "sidebar content"
-    "sidebar content";
-  grid-template-columns: 250px 1fr;
-  grid-template-rows: auto; /* Permite que a altura seja definida dinamicamente */
-  gap: 16px;
-  width: 90vw;
-  height: 90vh;
-}
-
 
 /* Sidebar (esquerda) */
 .sidebar {
@@ -122,14 +214,6 @@ body {
   flex-direction: column;
   gap: 16px;
   height: 100%; /* Garante que ocupe toda a altura disponível */
-}
-
-
-/* KPI */
-.kpi-container {
-  background-color: #eee;
-  padding: 16px;
-  text-align: center;
 }
 
 /* Barra de busca */
