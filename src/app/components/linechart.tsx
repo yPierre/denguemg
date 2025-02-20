@@ -95,7 +95,6 @@ export default function LineChart() {
       <h3 className="linechart-title">Casos Semanais por Ano</h3>
 
       {chartData ? (
-        <div className="h-[400px] w-full">
           <div className="linechart-container">
             <Line
               data={chartData}
@@ -142,7 +141,6 @@ export default function LineChart() {
               }}
             />
           </div>
-        </div>
       ) : (
         <p className="text-center">⏳ Carregando dados...</p>
       )}

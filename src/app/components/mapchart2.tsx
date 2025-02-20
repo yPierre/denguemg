@@ -35,9 +35,15 @@ interface StateData {
 }
 
 const MapChart2: React.FC = () => {
-  const { stateData } = useDataStore(); // Pega os dados do estado global
+  const { stateData, setSelectedCity } = useDataStore(); // Pega os dados do estado global
   const [geoData, setGeoData] = useState<GeoFeatureCollection | null>(null);
-  const [selectedCity, setSelectedCity] = useState<CityData | null>(null); // Estado para a cidade selecionada
+
+  const handleCityClick =(city: CityData) => {
+    console.log("Cidade clicada(mapchart2):", city.city);
+    setSelectedCity(city.city);
+  }
+
+
 
   // Carregar o GeoJSON de Minas Gerais
   useEffect(() => {
@@ -93,18 +99,16 @@ const MapChart2: React.FC = () => {
     const city = citiesMap.get(Number(feature.properties.id));
 
     if (city) {
-      // Tooltip
       layer.bindTooltip(
         `<strong>${feature.properties.name}</strong><br>Casos: ${city.casos}`,
         { permanent: false, sticky: true }
       );
 
-      // Evento de clique
       layer.on("click", () => {
-        setSelectedCity(city); // Armazena a cidade selecionada
-        const map = layer._map; // Acessa o mapa
-        const bounds = layer.getBounds(); // Obtém os limites da cidade
-        map.flyToBounds(bounds, { padding: [5, 5], maxZoom: 7 }); // Dá zoom na cidade
+        handleCityClick(city); // Chama a função ao clicar na cidade
+        const map = layer._map;
+        const bounds = layer.getBounds();
+        map.flyToBounds(bounds, { padding: [50, 50], maxZoom: 7 });
       });
     }
   };
@@ -129,12 +133,6 @@ const MapChart2: React.FC = () => {
         )}
       </MapContainer>
 
-      {/* Exibe a cidade selecionada (para teste) */}
-      {selectedCity && (
-        <div style={{ marginTop: "10px", textAlign: "center" }}>
-          <strong>Cidade selecionada:</strong> {selectedCity.city} (Casos: {selectedCity.casos})
-        </div>
-      )}
     </div>
   );
 };

@@ -95,9 +95,10 @@ export default function BarChart2() {
             indexAxis: "y",
             scales: {
               x: {
+                title: { display: true, text: "Número de casos por cidade" },
                 beginAtZero: true,
                 ticks: {
-                  font: { size: 14 },
+                  font: { size: 12 },
                 },
               },
               y: {

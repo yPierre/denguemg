@@ -4,15 +4,16 @@ import React from "react";
 import { useDataStore } from "@/store/dataStore"; // Importa o estado global
 
 // Função para formatar números (ex: 1000 -> 1.000)
-const formatNumber = (num: number): string => {
-  return num.toLocaleString("pt-BR");
-};
 
 const KPI: React.FC = () => {
-  const { stateData } = useDataStore(); // Pega os dados do estado global
+  const { stateData, cityData, selectedCity } = useDataStore(); // Pega os dados do estado global
 
+  console.log("Selected City(kpi): ", selectedCity);
+  console.log("cityData(kpi): ", cityData);
+  console.log("stateData(kpi):", stateData);
+  const currentData = selectedCity ? cityData : stateData;
   // Verificar se os dados necessários estão disponíveis
-  if (!stateData) {
+  if (!currentData) {
     return <div>Carregando KPIs...</div>;
   }
 
@@ -23,32 +24,33 @@ const KPI: React.FC = () => {
   return (
     <div className="kpi-container">
       {/* Título principal */}
-      <h2 className="kpi-main-title">CASOS CONFIRMADOS</h2>
-
+      <div className="kpi-main-title">
+        {selectedCity ? `Dados de ${selectedCity}` : "Dados do Estado"}
+      </div>
       {/* Valores e descrições */}
       <div className="kpi-grid">
         {/* Últimos 7 dias */}
         <div className="kpi-item">
-          <p className="kpi-value">{formatNumber(stateData[0].total_week_cases)}</p>
+          <p className="kpi-value">{currentData ? currentData[0].total_week_cases : "N/A"}</p>
           <p className="kpi-subtitle">Últimos 7 dias</p>
         </div>
 
         {/* Últimos 30 dias */}
         <div className="kpi-item">
-          <p className="kpi-value">{formatNumber(last30DaysCases)}</p>
+          <p className="kpi-value">{last30DaysCases}</p>
           <p className="kpi-subtitle">Últimos 30 dias</p>
         </div>
 
         {/* Acumulado no ano */}
         <div className="kpi-item">
-          <p className="kpi-value">{formatNumber(yearlyCases)}</p>
+          <p className="kpi-value">{yearlyCases}</p>
           <p className="kpi-subtitle">Acumulado</p>
         </div>
 
         {/* Cidades em nível de alerta */}
         <div className="kpi-item">
           <p className="kpi-value kpi-alert-value">
-            {formatNumber(stateData[0].cities_in_alert_state)}
+            {stateData[0].cities_in_alert_state}
           </p>
           <p className="kpi-subtitle">Cidades em nível de alerta</p>
         </div>
