@@ -6,6 +6,7 @@ import BarChart from "@/app/components/barchart2";
 import KPI from "@/app/components/kpis";
 import MapChart from "../components/mapchart2";
 import LineChart from "../components/linechart";
+import SearchBar from "../components/searchbar";
 
 export default function Page() {
   const { fetchStateData } = useDataStore();
@@ -23,7 +24,7 @@ export default function Page() {
           <div className="kpi-container">
             <KPI />
           </div>
-          <input type="text" placeholder="Buscar cidade..." className="search-bar" />
+          <SearchBar />
           <BarChart />
         </aside>
 

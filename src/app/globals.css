@@ -34,12 +34,7 @@ body {
   overflow: hidden; /* Garante que o scroll fique apenas no gráfico */
 }
 
-/* Barra de busca */
-.search-bar {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
+
 
 /* Gráfico de barras ocupando todo o espaço disponível abaixo */
 .barchart-container {
@@ -54,6 +49,7 @@ body {
 
 .barchart-wrapper {
   flex-grow: 1;
+  
   overflow-x: auto; /* Adiciona barra de rolagem horizontal se necessário */
   overflow-y: hidden; /* Evita alteração na espessura das barras */
   padding-bottom: 10px; /* Evita que a barra de rolagem encoste no gráfico */
@@ -150,12 +146,6 @@ body {
   height: 100%; /* Garante que ocupe toda a altura disponível */
 }
 
-/* Barra de busca */
-.search-bar {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
 
 /* Mapa */
 .map-container {
@@ -175,12 +165,6 @@ body {
   height: 100%; /* Garante que ocupe toda a altura disponível */
 }
 
-/* Barra de busca */
-.search-bar {
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-}
 
 
 /* Mapa */
@@ -188,6 +172,65 @@ body {
   flex-grow: 2; /* Ocupa a maior parte do bloco direito */
   min-height: 400px;
   
+}
+
+/*Search Bar */
+.search-bar-container {
+  position: relative;
+  width: 100%;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.search-bar {
+  width: 90%;
+  padding: 8px;
+  font-size: 16px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+}
+
+.suggestions-list {
+  position: absolute;
+  width: 100%;
+  max-height: 200px;
+  overflow-y: auto;
+  background-color: #fff;
+  border: 1px solid #ccc;
+  border-top: none;
+  border-radius: 0 0 5px 5px;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  z-index: 1000;
+}
+
+.suggestion-item {
+  padding: 10px;
+  cursor: pointer;
+}
+
+.suggestion-item:hover {
+  background-color: #f0f0f0;
+}
+
+.reset-button {
+  position: absolute; /* Posicionamento absoluto em relação ao contêiner do mapa */
+  top: 75px; /* Distância do topo */
+  left: 11px; /* Distância da direita */
+  z-index: 1000; /* Garante que o botão fique acima do mapa */
+  background-color: #fff; /* Cor de fundo */
+  border: 2px solid #ccc; /* Borda */
+  border-radius: 5px; /* Cantos arredondados */
+  cursor: pointer; /* Cursor de ponteiro */
+  font-size: 12px; /* Tamanho da fonte */
+  text-align: center; /* Centraliza o texto */
+  transition: background-color 0.3s ease; /* Transição suave para o hover */
+}
+
+.reset-button:hover {
+  background-color: #f0f0f0; /* Cor de fundo ao passar o mouse */
+  color: #000; /* Cor do texto ao passar o mouse */
 }
 
 

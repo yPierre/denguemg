@@ -1,9 +1,10 @@
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useDataStore } from "@/store/dataStore"; // Importa o estado global
+import L from "leaflet";
 
 // Definindo tipos para os dados geoespaciais
 interface GeoFeature {
@@ -35,15 +36,33 @@ interface StateData {
 }
 
 const MapChart2: React.FC = () => {
-  const { stateData, setSelectedCity } = useDataStore(); // Pega os dados do estado global
+  const { stateData, setSelectedCity, selectedCity } = useDataStore(); // Pega os dados do estado global
   const [geoData, setGeoData] = useState<GeoFeatureCollection | null>(null);
+  const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Referência para a camada GeoJSON
 
-  const handleCityClick =(city: CityData) => {
-    console.log("Cidade clicada(mapchart2):", city.city);
-    setSelectedCity(city.city);
-  }
+  // Função para dar zoom na cidade pesquisada
+  useEffect(() => {
+    if (selectedCity && geoJsonLayerRef.current && stateData) {
+      // Encontra a cidade no stateData
+      const city = stateData[0].cities.find((c) => c.city === selectedCity);
+      if (city) {
+        // Encontra o feature correspondente no GeoJSON
+        const feature = geoData?.features.find(
+          (f) => Number(f.properties.id) === city.geocode
+        );
 
+        if (feature && geoJsonLayerRef.current) {
+          // Cria uma camada temporária para o feature
+          const layer = L.geoJSON(feature);
+          const bounds = layer.getBounds();
 
+          // Centraliza e dá zoom no mapa
+          const map = geoJsonLayerRef.current._map;
+          map.flyToBounds(bounds, { padding: [50, 50], maxZoom: 7, duration: 1 });
+        }
+      }
+    }
+  }, [selectedCity, geoData, stateData]);
 
   // Carregar o GeoJSON de Minas Gerais
   useEffect(() => {
@@ -58,6 +77,7 @@ const MapChart2: React.FC = () => {
   if (!geoData || !stateData) {
     return <div>Carregando mapa...</div>;
   }
+  
 
   // Função para definir as cores com base no nível de alerta
   const getColorByNivel = (nivel: number) => {
@@ -105,16 +125,48 @@ const MapChart2: React.FC = () => {
       );
 
       layer.on("click", () => {
-        handleCityClick(city); // Chama a função ao clicar na cidade
+        setSelectedCity(city.city); // Atualiza a cidade selecionada
         const map = layer._map;
         const bounds = layer.getBounds();
-        map.flyToBounds(bounds, { padding: [50, 50], maxZoom: 7 });
+        map.flyToBounds(bounds, { padding: [50, 50], maxZoom: 7, duration: 1 });
       });
     }
   };
 
+  const handleResetToState = () => {
+    setSelectedCity(null); // Redefine a cidade selecionada
+    const map = geoJsonLayerRef.current._map;
+    map.flyTo([-18.5122, -44.555], 6, { duration: 1 }); // Volta ao zoom inicial
+  };
+
+  
+
   return (
-    <div style={{ height: "600px", width: "100%" }}>
+    <div style={{ height: "600px", width: "100%", position: "relative"}}>
+      <button className="reset-button"
+      onClick={handleResetToState}
+      style={{
+        position: "absolute",
+        zIndex: 1000,
+        padding: "5px",
+        backgroundColor: "#fff",
+        cursor: "pointer",
+      }}
+    >
+      <svg
+        xmlns="http://www.w3.org/2000/svg"
+        viewBox="0 0 24 24"
+        width="19"
+        height="19"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      >
+        <path d="M19 12H5M12 19l-7-7 7-7" />
+      </svg>
+    </button>
       <MapContainer
         center={[-18.5122, -44.555]} // Centro de Minas Gerais
         zoom={6}
@@ -126,13 +178,13 @@ const MapChart2: React.FC = () => {
         />
         {stateData && (
           <GeoJSON
-            data={geoData} // Certifique-se de que geoData está no stateData
+            ref={geoJsonLayerRef} // Referência para a camada GeoJSON
+            data={geoData}
             style={styleFeature}
             onEachFeature={onEachFeature}
           />
         )}
       </MapContainer>
-
     </div>
   );
 };

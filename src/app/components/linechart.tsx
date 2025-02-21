@@ -17,19 +17,19 @@ import { useDataStore } from "@/store/dataStore"; // Importa o estado global
 Chart.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
 
 export default function LineChart() {
-  const { stateData } = useDataStore(); // Pega os dados do estado global
+  const { stateData, cityData } = useDataStore(); // Pega os dados do estado global e da cidade
   const [chartData, setChartData] = useState<any>(null);
 
   // Processa os dados para o gráfico
   useEffect(() => {
-    if (!stateData) return;
+    const data = cityData ? cityData[0].data : stateData; // Usa cityData se disponível, senão stateData
 
-    //console.log("📊 Processando dados recebidos(linechart)...");
+    if (!data) return;
 
     // Extrair os dados de semanas epidemiológicas (SE) e casos
-    const seData = stateData.map((entry: any) => ({
+    const seData = data.map((entry: any) => ({
       SE: entry.SE,
-      total_week_cases: entry.total_week_cases,
+      total_week_cases: cityData ? entry.casos : entry.total_week_cases, // Ajusta o campo de casos
     }));
 
     // Agrupar dados por ano
@@ -45,8 +45,6 @@ export default function LineChart() {
       groupedData[year][week - 1] = total_week_cases; // Insere os casos na semana correspondente
     });
 
-    //console.log("📅 Dados agrupados por ano(linechart):", groupedData);
-
     // Nova paleta de cores
     const colors = [
       "rgba(75, 192, 192, 0.8)", // Azul esverdeado
@@ -61,8 +59,6 @@ export default function LineChart() {
 
     // Criar datasets para cada ano
     const datasets = Object.entries(groupedData).map(([year, cases], index) => {
-      //console.log(`🎨 Criando dataset para o ano ${year}, dados(linechart):`, cases);
-
       return {
         label: `${year}`,
         data: cases,
@@ -74,19 +70,14 @@ export default function LineChart() {
       };
     });
 
-    console.log("📊 Dados finais para o gráfico(linechart):", {
-      labels: Array.from({ length: 52 }, (_, i) => i + 1),
-      datasets,
-    });
-
     setChartData({
       labels: Array.from({ length: 52 }, (_, i) => i + 1), // Semanas de 1 a 52
       datasets,
     });
-  }, [stateData]); // Atualiza o gráfico sempre que `stateData` mudar
+  }, [stateData, cityData]); // Atualiza o gráfico sempre que `stateData` ou `cityData` mudar
 
   // Exibe um indicador de carregamento enquanto os dados estão sendo buscados
-  if (!stateData) {
+  if (!stateData && !cityData) {
     return <p className="text-center">⏳ Carregando dados...</p>;
   }
 
@@ -95,52 +86,52 @@ export default function LineChart() {
       <h3 className="linechart-title">Casos Semanais por Ano</h3>
 
       {chartData ? (
-          <div className="linechart-container">
-            <Line
-              data={chartData}
-              options={{
-                responsive: true,
-                maintainAspectRatio: false,
-                interaction: {
-                  mode: "index", // Permite interagir com múltiplos datasets ao mesmo tempo
-                  intersect: false, // Exibe o tooltip ao passar o mouse sobre a linha
+        <div className="linechart-container">
+          <Line
+            data={chartData}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              interaction: {
+                mode: "index", // Permite interagir com múltiplos datasets ao mesmo tempo
+                intersect: false, // Exibe o tooltip ao passar o mouse sobre a linha
+              },
+              scales: {
+                x: {
+                  title: { display: true, text: "Semana Epidemiológica" },
                 },
-                scales: {
-                  x: {
-                    title: { display: true, text: "Semana Epidemiológica" },
-                  },
-                  y: {
-                    beginAtZero: true,
-                    title: { display: true, text: "Casos" },
+                y: {
+                  beginAtZero: true,
+                  title: { display: true, text: "Casos" },
+                },
+              },
+              plugins: {
+                legend: {
+                  onClick: (e, legendItem, legend) => {
+                    const index = legendItem.datasetIndex;
+                    if (index === undefined) return;
+
+                    const chart = legend.chart;
+                    const meta = chart.getDatasetMeta(index);
+                    meta.hidden = !meta.hidden;
+
+                    chart.update();
                   },
                 },
-                plugins: {
-                  legend: {
-                    onClick: (e, legendItem, legend) => {
-                      const index = legendItem.datasetIndex;
-                      if (index === undefined) return;
-
-                      const chart = legend.chart;
-                      const meta = chart.getDatasetMeta(index);
-                      meta.hidden = !meta.hidden;
-
-                      chart.update();
+                tooltip: {
+                  callbacks: {
+                    title: (context) => `Semana ${context[0].label}`, // Título do tooltip
+                    label: (context) => {
+                      const datasetLabel = context.dataset.label || "";
+                      const value = context.raw;
+                      return `${datasetLabel}: ${value} casos`;
                     },
                   },
-                  tooltip: {
-                    callbacks: {
-                      title: (context) => `Semana ${context[0].label}`, // Título do tooltip
-                      label: (context) => {
-                        const datasetLabel = context.dataset.label || "";
-                        const value = context.raw;
-                        return `${datasetLabel}: ${value} casos`;
-                      },
-                    },
-                  },
                 },
-              }}
-            />
-          </div>
+              },
+            }}
+          />
+        </div>
       ) : (
         <p className="text-center">⏳ Carregando dados...</p>
       )}
