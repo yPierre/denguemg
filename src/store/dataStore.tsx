@@ -26,7 +26,7 @@ export const useDataStore = create<DataState>((set) => ({
       const data = await response.json();
       set({ stateData: data, loading: false });
     } catch (error) {
-      console.error("Erro ao buscar dados do estado:", error);
+      //console.error("Erro ao buscar dados do estado:", error);
       set({ loading: false });
     }
   },
@@ -34,20 +34,21 @@ export const useDataStore = create<DataState>((set) => ({
   // Busca os dados da cidade
   fetchCityData: async (city) => {
     set({ loadingCity: true });
+    //console.log("City(fetchCityData):", city);
     try {
-      const response = await fetch(`/api/citiesv3?city=${city}`);
+      const response = await fetch(`/api/cities?city=${city}`);
       const data = await response.json();
-      console.log("Dados da cidade carregados:", data); // Verifique se os dados estão chegando
+      //console.log("Dados da cidade carregados(dataStore):", data); // Verifique se os dados estão chegando
       set({ cityData: data, loadingCity: false });
     } catch (error) {
-      console.error("Erro ao buscar dados da cidade:", error);
+      //console.error("Erro ao buscar dados da cidade(dataStore):", error);
       set({ loadingCity: false });
     }
   },
 
   // Define a cidade selecionada
   setSelectedCity: (city) => {
-    console.log("Cidade selecionada(dataStore):", city);
+    //console.log("Cidade selecionada(dataStore):", city);
     set({ selectedCity: city });
     if (city) {
       useDataStore.getState().fetchCityData(city); // Busca os dados da cidade

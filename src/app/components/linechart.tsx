@@ -24,7 +24,7 @@ export default function LineChart() {
   useEffect(() => {
     if (!stateData) return;
 
-    console.log("📊 Processando dados recebidos...");
+    //console.log("📊 Processando dados recebidos(linechart)...");
 
     // Extrair os dados de semanas epidemiológicas (SE) e casos
     const seData = stateData.map((entry: any) => ({
@@ -45,7 +45,7 @@ export default function LineChart() {
       groupedData[year][week - 1] = total_week_cases; // Insere os casos na semana correspondente
     });
 
-    console.log("📅 Dados agrupados por ano:", groupedData);
+    //console.log("📅 Dados agrupados por ano(linechart):", groupedData);
 
     // Nova paleta de cores
     const colors = [
@@ -61,7 +61,7 @@ export default function LineChart() {
 
     // Criar datasets para cada ano
     const datasets = Object.entries(groupedData).map(([year, cases], index) => {
-      console.log(`🎨 Criando dataset para o ano ${year}, dados:`, cases);
+      //console.log(`🎨 Criando dataset para o ano ${year}, dados(linechart):`, cases);
 
       return {
         label: `${year}`,
@@ -74,7 +74,7 @@ export default function LineChart() {
       };
     });
 
-    console.log("📊 Dados finais para o gráfico:", {
+    console.log("📊 Dados finais para o gráfico(linechart):", {
       labels: Array.from({ length: 52 }, (_, i) => i + 1),
       datasets,
     });
