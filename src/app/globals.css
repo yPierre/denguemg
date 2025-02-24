@@ -126,6 +126,13 @@ body {
   color: #00bfff; /* Azul claro */
 }
 
+.kpi-footer {
+  margin-top: 16px;
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+}
+
 /* Header */
 .header {
   padding: 16px;

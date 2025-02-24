@@ -13,36 +13,62 @@ import {
 } from "chart.js";
 import { useDataStore } from "@/store/dataStore"; // Importa o estado global
 
+interface StateDataEntry {
+  SE: number;
+  total_week_cases: number;
+}
+
+interface CityDataEntry {
+  SE: number;
+  casos: number;
+}
+
+type DataEntry = StateDataEntry | CityDataEntry;
+
 // Registrar componentes do Chart.js
 Chart.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
 
 export default function LineChart() {
   const { stateData, cityData } = useDataStore(); // Pega os dados do estado global e da cidade
-  const [chartData, setChartData] = useState<any>(null);
+  const [chartData, setChartData] = useState<{
+    labels: number[];
+    datasets: {
+      label: string;
+      data: (number | null)[];
+      fill: boolean;
+      borderColor: string;
+      backgroundColor: string;
+      pointRadius: number;
+      hidden: boolean;
+    }[];
+  } | null>(null);
 
   // Processa os dados para o gráfico
   useEffect(() => {
-    const data = cityData ? cityData[0].data : stateData; // Usa cityData se disponível, senão stateData
+    const data: DataEntry[] = cityData ? cityData[0].data : stateData; // Usa cityData se disponível, senão stateData
 
     if (!data) return;
 
     // Extrair os dados de semanas epidemiológicas (SE) e casos
-    const seData = data.map((entry: any) => ({
+    const seData: DataEntry[] = data.map((entry) => ({
       SE: entry.SE,
-      total_week_cases: cityData ? entry.casos : entry.total_week_cases, // Ajusta o campo de casos
+      total_week_cases: "casos" in entry ? entry.casos : entry.total_week_cases, // Ajusta o campo de casos
     }));
 
     // Agrupar dados por ano
     const groupedData: { [year: number]: number[] } = {};
-    seData.forEach(({ SE, total_week_cases }) => {
-      const year = Math.floor(SE / 100); // Ex: 202452 -> 2024
-      const week = SE % 100; // Ex: 202452 -> 52
-
+    seData.forEach((entry) => {
+      const year = Math.floor(entry.SE / 100); // Ex: 202452 -> 2024
+      const week = entry.SE % 100; // Ex: 202452 -> 52
+    
+      // Garante que o total_week_cases existe no entry, independente do tipo
+      const totalCases = "casos" in entry ? entry.casos : entry.total_week_cases;
+    
       if (!groupedData[year]) {
         groupedData[year] = Array(52).fill(null); // Cria um array com 52 semanas (inicialmente nulo)
       }
-
-      groupedData[year][week - 1] = total_week_cases; // Insere os casos na semana correspondente
+    
+      groupedData[year][week - 1] = totalCases; // Insere os casos na semana correspondente
     });
 
     // Nova paleta de cores
