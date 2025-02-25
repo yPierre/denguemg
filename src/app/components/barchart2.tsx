@@ -14,6 +14,13 @@ import {
 import ChartDataLabels from "chartjs-plugin-datalabels";
 import { useDataStore } from "@/store/dataStore"; // Importa o estado global
 
+interface CityData {
+  city: string;
+  geocode: number;
+  casos: number;
+  nivel: number;
+}
+
 Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 export default function BarChart2() {
@@ -41,17 +48,14 @@ export default function BarChart2() {
     // Verifica se os dados atuais e as cidades estão disponíveis
     if (!currentStateData || !Array.isArray(currentStateData.cities)) return;
 
-    // Captura a última semana epidemiológica disponível
-    const latestSE = currentStateData.cities[0]?.SE || "Desconhecido";
-
     // Ordena cidades por número de casos e pega as 15 com mais casos
     const sortedCities = currentStateData.cities
-      .sort((a: any, b: any) => b.casos - a.casos)
+      .sort((a: CityData, b: CityData) => b.casos - a.casos)
       .slice(0, 15);
 
-    const labels = sortedCities.map((city) => city.city);
-    const casos = sortedCities.map((city) => city.casos);
-    const backgroundColors = sortedCities.map((city) => getAlertColor(city.nivel));
+    const labels = sortedCities.map((city: CityData) => city.city);
+    const casos = sortedCities.map((city: CityData) => city.casos);
+    const backgroundColors = sortedCities.map((city: CityData) => getAlertColor(city.nivel));
 
     setChartData({
       labels: labels,
@@ -60,7 +64,7 @@ export default function BarChart2() {
           label: "Casos na Última Semana",
           data: casos,
           backgroundColor: backgroundColors,
-          borderColor: backgroundColors.map((color) => color.replace("0.6", "1")),
+          borderColor: backgroundColors.map((color: string) => color.replace("0.6", "1")),
           borderWidth: 1,
         },
       ],
@@ -118,7 +122,8 @@ export default function BarChart2() {
                   weight: "bold",
                 },
                 formatter: (value, context) => {
-                  return `${context.chart.data.labels[context.dataIndex]}: ${value}`;
+                  const labels = context.chart.data.labels as string[] | undefined;
+                  return labels ? `${labels[context.dataIndex]}: ${value}` : `${value}`;
                 },
                 offset: 10,
               },

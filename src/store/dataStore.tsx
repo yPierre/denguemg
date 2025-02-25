@@ -1,8 +1,22 @@
 import { create } from "zustand";
 
+interface CityData {
+  city: string;
+  geocode: number;
+  casos: number;
+  nivel: number;
+}
+
+interface StateData {
+  total_week_cases: number;
+  total_pop: number;
+  cities_in_alert_state: number;
+  cities: CityData[];
+}
+
 interface DataState {
-  stateData: any | null;
-  cityData: any | null;
+  stateData: StateData[] | null;
+  cityData: CityData | null;
   selectedCity: string | null;
   loading: boolean;
   loadingCity: boolean;
@@ -26,7 +40,7 @@ export const useDataStore = create<DataState>((set) => ({
       const data = await response.json();
       set({ stateData: data, loading: false });
     } catch (error) {
-      //console.error("Erro ao buscar dados do estado:", error);
+      console.error("Erro ao buscar dados do estado:", error);
       set({ loading: false });
     }
   },
@@ -41,7 +55,7 @@ export const useDataStore = create<DataState>((set) => ({
       //console.log("Dados da cidade carregados(dataStore):", data); // Verifique se os dados estão chegando
       set({ cityData: data, loadingCity: false });
     } catch (error) {
-      //console.error("Erro ao buscar dados da cidade(dataStore):", error);
+      console.error("Erro ao buscar dados da cidade(dataStore):", error);
       set({ loadingCity: false });
     }
   },

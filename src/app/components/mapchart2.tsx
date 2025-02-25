@@ -5,13 +5,14 @@ import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import "leaflet/dist/leaflet.css";
 import { useDataStore } from "@/store/dataStore"; // Importa o estado global
 import L from "leaflet";
+import { Feature, Geometry } from "geojson";
 
 // Definindo tipos para os dados geoespaciais
 interface GeoFeature {
-  type: string;
+  type: "Feature"; // Defina o tipo como "Feature"
   properties: { name: string; id: number };
   geometry: {
-    type: string;
+    type: "Polygon" | "MultiPolygon"; // Defina os tipos de geometria suportados
     coordinates: number[][][];
   };
 }
@@ -21,6 +22,11 @@ interface GeoFeatureCollection {
   features: GeoFeature[];
 }
 
+interface GeoFeatureProperties {
+  name: string;
+  id: number;
+}
+
 interface CityData {
   city: string;
   geocode: number;
@@ -28,23 +34,19 @@ interface CityData {
   nivel: number;
 }
 
-interface StateData {
-  total_week_cases: number;
-  total_pop: number;
-  cities_in_alert_state: number;
-  cities: CityData[];
-}
+
 
 const MapChart2: React.FC = () => {
   const { stateData, setSelectedCity, selectedCity } = useDataStore(); // Pega os dados do estado global
   const [geoData, setGeoData] = useState<GeoFeatureCollection | null>(null);
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Referência para a camada GeoJSON
+  const mapRef = useRef<L.Map | null>(null);
 
   // Função para dar zoom na cidade pesquisada
   useEffect(() => {
     if (selectedCity && geoJsonLayerRef.current && stateData) {
       // Encontra a cidade no stateData
-      const city = stateData[0].cities.find((c) => c.city === selectedCity);
+      const city = stateData[0].cities.find((c: CityData) => c.city === selectedCity);
       if (city) {
         // Encontra o feature correspondente no GeoJSON
         const feature = geoData?.features.find(
@@ -57,8 +59,9 @@ const MapChart2: React.FC = () => {
           const bounds = layer.getBounds();
 
           // Centraliza e dá zoom no mapa
-          const map = geoJsonLayerRef.current._map;
-          map.flyToBounds(bounds, { padding: [50, 50], maxZoom: 7, duration: 1 });
+          const map = mapRef.current;
+          if(map)
+            map.flyToBounds(bounds, { padding: [50, 50], maxZoom: 7, duration: 1 });
         }
       }
     }
@@ -97,12 +100,22 @@ const MapChart2: React.FC = () => {
 
   // Mapear os dados das cidades para o GeoJSON
   const citiesMap = new Map<number, CityData>();
-  stateData[0].cities.forEach((city) => {
+  stateData[0].cities.forEach((city: CityData) => {
     citiesMap.set(city.geocode, city);
   });
 
   // Estilo dos municípios
-  const styleFeature = (feature: GeoFeature) => {
+  const styleFeature = (feature: Feature<Geometry, GeoFeatureProperties> | undefined) => {
+    // Se o feature for undefined, retorne um estilo padrão
+    if (!feature) {
+      return {
+        fillColor: "#C8C8C8", // Cinza (padrão)
+        weight: 1,
+        opacity: 1,
+        color: "#000",
+        fillOpacity: 0.5,
+      };
+    }
     const city = citiesMap.get(Number(feature.properties.id));
     const nivel = city ? city.nivel : 1;
     return {
@@ -115,7 +128,7 @@ const MapChart2: React.FC = () => {
   };
 
   // Tooltip e evento de clique para cada município
-  const onEachFeature = (feature: GeoFeature, layer: L.Layer) => {
+  const onEachFeature = (feature: Feature<Geometry, GeoFeatureProperties>, layer: L.Layer) => {
     const city = citiesMap.get(Number(feature.properties.id));
 
     if (city) {
@@ -126,17 +139,23 @@ const MapChart2: React.FC = () => {
 
       layer.on("click", () => {
         setSelectedCity(city.city); // Atualiza a cidade selecionada
-        const map = layer._map;
-        const bounds = layer.getBounds();
-        map.flyToBounds(bounds, { padding: [50, 50], maxZoom: 7, duration: 1 });
+        
+        layer.on("add", (event) => {
+          const map = event.target._map; // Agora _map é acessível via evento
+          const bounds = (layer as L.Polygon).getBounds(); // Cast para L.Polygon (ou o tipo correto)
+          map.flyToBounds(bounds, { padding: [50, 50], maxZoom: 7, duration: 1 });
+        });
       });
     }
   };
 
+
   const handleResetToState = () => {
     setSelectedCity(null); // Redefine a cidade selecionada
-    const map = geoJsonLayerRef.current._map;
-    map.flyTo([-18.5122, -44.555], 6, { duration: 1 }); // Volta ao zoom inicial
+    if (mapRef.current) {
+      const map = mapRef.current;
+      map.flyTo([-18.5122, -44.555], 6, { duration: 1 }); // Volta ao zoom inicial
+    }
   };
 
   
@@ -148,7 +167,6 @@ const MapChart2: React.FC = () => {
       style={{
         position: "absolute",
         zIndex: 1000,
-        padding: "5px",
         backgroundColor: "#fff",
         cursor: "pointer",
       }}
@@ -156,8 +174,8 @@ const MapChart2: React.FC = () => {
       <svg
         xmlns="http://www.w3.org/2000/svg"
         viewBox="0 0 24 24"
-        width="19"
-        height="19"
+        width="20"
+        height="22"
         fill="none"
         stroke="currentColor"
         strokeWidth="2"
@@ -171,6 +189,7 @@ const MapChart2: React.FC = () => {
         center={[-18.5122, -44.555]} // Centro de Minas Gerais
         zoom={6}
         style={{ height: "100%", width: "100%" }}
+        ref={mapRef}
       >
         <TileLayer
           url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
@@ -179,7 +198,7 @@ const MapChart2: React.FC = () => {
         {stateData && (
           <GeoJSON
             ref={geoJsonLayerRef} // Referência para a camada GeoJSON
-            data={geoData}
+            data={geoData as GeoJSON.FeatureCollection}
             style={styleFeature}
             onEachFeature={onEachFeature}
           />

@@ -19,7 +19,7 @@ export async function GET(request) {
 
         return NextResponse.json(cities);
     } catch (error) {
-        //console.error("Erro ao buscar dados:", error);
+        console.error("Erro ao buscar dados:", error);
         return NextResponse.json({ error: "Erro ao buscar cidades" }, { status: 500 });
     }
 }
