@@ -1,13 +1,27 @@
 import { create } from "zustand";
 
+interface Week{
+  Rt: number;
+  SE: number;
+  casos: number;
+  nivel: number;
+  nivel_inc: number;
+  notif_accum_year: number;
+  p_inc100k: number;
+  p_rt1: number;
+  //colocar mais itens aqui dps
+}
+
 interface CityData {
   city: string;
   geocode: number;
   casos: number;
   nivel: number;
+  data: Week[];
 }
 
 interface StateData {
+  SE: number;
   total_week_cases: number;
   total_pop: number;
   cities_in_alert_state: number;
@@ -16,7 +30,7 @@ interface StateData {
 
 interface DataState {
   stateData: StateData[] | null;
-  cityData: CityData | null;
+  cityData: CityData[] | null;
   selectedCity: string | null;
   loading: boolean;
   loadingCity: boolean;
@@ -52,7 +66,7 @@ export const useDataStore = create<DataState>((set) => ({
     try {
       const response = await fetch(`/api/cities?city=${city}`);
       const data = await response.json();
-      //console.log("Dados da cidade carregados(dataStore):", data); // Verifique se os dados estão chegando
+      console.log("CityData(dataStore):", data); // Verifique se os dados estão chegando
       set({ cityData: data, loadingCity: false });
     } catch (error) {
       console.error("Erro ao buscar dados da cidade(dataStore):", error);

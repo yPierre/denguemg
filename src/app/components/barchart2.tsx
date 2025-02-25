@@ -29,11 +29,7 @@ export default function BarChart2() {
   // Extrai os dados atuais (posição 0 do array) ou define como null se não existir
   const currentStateData = stateData?.[0] || null;
 
-  // Exibe a semana epidemiológica no console, se disponível
   useEffect(() => {
-    if (currentStateData) {
-      console.log("SE:", currentStateData.SE);
-    }
   }, [currentStateData]);
 
   const [chartData, setChartData] = useState<{

@@ -45,7 +45,7 @@ export default function LineChart() {
 
   // Processa os dados para o gráfico
   useEffect(() => {
-    const data: DataEntry[] = cityData ? cityData[0].data : stateData; // Usa cityData se disponível, senão stateData
+    const data: DataEntry[] = cityData ? cityData[0].data : (stateData || []); // Usa cityData se disponível, senão stateData
 
     if (!data) return;
 
