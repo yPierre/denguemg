@@ -7,6 +7,8 @@ import BarChart from "@/app/components/barchart2";
 import KPI from "@/app/components/kpis";
 import LineChart from "../components/linechart";
 import SearchBar from "../components/searchbar";
+import Header from "../components/header";
+
 
 const MapChart = dynamic(() => import("../components/mapchart2"), {
   ssr: false, // Desativa a renderização no servidor para este componente
@@ -20,9 +22,7 @@ export default function Page() {
 
   return (
     <>
-      <header className="header">
-        Painel de Monitoramento da Dengue
-      </header>
+      <Header />
       <main className="main-container">
         <div className="container">
           {/* Sidebar (esquerda) */}

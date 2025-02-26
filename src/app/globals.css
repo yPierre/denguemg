@@ -23,7 +23,7 @@ body {
   grid-template-columns: 250px 1fr;
   grid-template-rows: 1fr;
   width: 95vw;
-  height: 95vh;
+  height: 94vh;
 }
 
 /* Sidebar deve ocupar toda a altura da tela sem empurrar o conteúdo */
@@ -33,6 +33,8 @@ body {
   flex-direction: column;
   height: 100%; /* Ocupa toda a altura do grid */
 }
+
+
 
 
 
@@ -78,6 +80,10 @@ body {
   color: #333; /* Cinza escuro para melhor contraste */
   margin: 8px;
   text-align: left;
+}
+
+.component-title.first{
+  height: 42px;
 }
 
 
@@ -141,15 +147,42 @@ body {
 /* Header */
 .header {
   width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: flex-start;
   background: linear-gradient(135deg, #1A73E8, #63B4FF);
-  color: white;
-  padding: 16px;
+  color: #fff;
   text-align: center;
   font-size: 24px;
   font-weight: bold;
   box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.1);
   position: relative; /* Garante que o header respeite o fluxo normal */
   z-index: 10; /* Para ficar acima de outros elementos */
+}
+
+
+.logo-component {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espaço entre o logo e o texto */
+  padding-left: 10px; /* Espaçamento interno */
+  border-radius: 5px; /* Cantos arredondados */
+}
+
+.logo {
+  border-radius: 5px; /* Estilo opcional para o logo */
+}
+
+.site-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.header-title{
+  position: absolute;
+  left: 50%; /* Move o título para o centro horizontal */
+  top: 50%; /* Move o título para o centro vertical */
+  transform: translate(-50%, -50%); /* Ajusta o posicionamento para o centro exato */
 }
 
 /* Mapa */
@@ -159,6 +192,7 @@ body {
   margin: 0rem;
   
 }
+
 
 
 /*Search Bar */

@@ -77,7 +77,7 @@ const KPI: React.FC = () => {
   return (
     <div className="kpi-container">
       {/* Título principal */}
-      <h3 className="component-title">
+      <h3 className="component-title first">
         {selectedCity ? `Indicadores de ${selectedCity}` : "Indicadores de Minas Gerais"}
       </h3>
       {/* Valores e descrições */}
