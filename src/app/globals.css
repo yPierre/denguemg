@@ -1,17 +1,19 @@
 body {
   max-width: 100vw;
   overflow-x: hidden;
-  color: var(--foreground);
-  background: var(--background);
+  color: #4A4A4A;
+  background: #F9F9F9;
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   display: flex;
+  flex-direction: column;
+  min-height: 100vh;
   justify-content: center;
   align-items: center;
   height: 100vh;
+  margin: 0;
 }
-
 
 .container {
   display: grid;
@@ -29,9 +31,7 @@ body {
   grid-area: sidebar;
   display: flex;
   flex-direction: column;
-  gap: 16px;
   height: 100%; /* Ocupa toda a altura do grid */
-  overflow: hidden; /* Garante que o scroll fique apenas no gráfico */
 }
 
 
@@ -39,7 +39,8 @@ body {
 /* Gráfico de barras ocupando todo o espaço disponível abaixo */
 .barchart-container {
   flex-grow: 1; /* Ocupa todo o espaço restante na sidebar */
-  padding-bottom: 5px;
+  margin: 0rem 0.5rem;
+  padding-bottom: 12px;
   height: 500px;
   display: flex;
   flex-direction: column;
@@ -49,10 +50,8 @@ body {
 
 .barchart-wrapper {
   flex-grow: 1;
-  
   overflow-x: auto; /* Adiciona barra de rolagem horizontal se necessário */
   overflow-y: hidden; /* Evita alteração na espessura das barras */
-  padding-bottom: 10px; /* Evita que a barra de rolagem encoste no gráfico */
 }
 
 
@@ -61,37 +60,38 @@ body {
   grid-area: content;
   display: flex;
   flex-direction: column;
-  gap: 16px;
-  padding-bottom: 15px;
+  height: 100%; /* Ocupa toda a altura do grid */
 }
 
-/* Mapa */
-.map-container {
-  flex-grow: 2; /* Ocupa a maior parte do bloco direito */
-  min-height: 350px;
-}
 
 /* Gráfico de linhas */
 .linechart-container {
   flex-grow: 1; /* Ocupa o restante da altura */
+  margin: 0rem 0.5rem;
   min-height: 300px;
+  padding-bottom: 12px;
 }
 
-.linechart-title{
-  margin: 0px;
+.component-title{
+  font-size: 18px;
+  font-weight: bold;
+  color: #333; /* Cinza escuro para melhor contraste */
+  margin: 8px;
+  text-align: left;
 }
+
 
 /* KPI */
 /* Estilos para o componente KPI */
 .kpi-container {
-  padding: 5px;
-  background-color: #f5f5f5;
-  border-radius: 10px;
-  max-width: 600px; /* Largura máxima para ocupar menos espaço */
-  margin: 0 auto; /* Centralizar na tela */
+  margin: 0rem 0.5rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .kpi-main-title {
+  margin: 0.5rem 0rem;
   font-size: 16px;
   font-weight: bold;
   color: #444;
@@ -108,10 +108,15 @@ body {
   text-align: center;
 }
 
+.kpi-item:hover {
+  transition: transform 0.2s;
+}
+
 .kpi-value {
   font-size: 24px;
   font-weight: bold;
-  color: #000000;
+  border-left: 4px solid #1A73E8;
+  color: #111;
   margin: 0;
 }
 
@@ -123,7 +128,7 @@ body {
 
 /* Cor específica para o número de cidades em alerta */
 .kpi-alert-value {
-  color: #00bfff; /* Azul claro */
+  color: #1A73E8;
 }
 
 .kpi-footer {
@@ -135,58 +140,33 @@ body {
 
 /* Header */
 .header {
+  width: 100%;
+  background: linear-gradient(135deg, #1A73E8, #63B4FF);
+  color: white;
   padding: 16px;
   text-align: center;
   font-size: 24px;
   font-weight: bold;
-  color: #000000;
-  background-color: #00bfff;
+  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+  position: relative; /* Garante que o header respeite o fluxo normal */
+  z-index: 10; /* Para ficar acima de outros elementos */
 }
-
-
-/* Sidebar (esquerda) */
-.sidebar {
-  grid-area: sidebar;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  height: 100%; /* Garante que ocupe toda a altura disponível */
-}
-
 
 /* Mapa */
 .map-container {
   flex-grow: 2; /* Ocupa a maior parte do bloco direito */
   min-height: 400px;
+  margin: 0rem;
   
 }
 
-
-
-/* Sidebar (esquerda) */
-.sidebar {
-  grid-area: sidebar;
-  display: flex;
-  flex-direction: column;
-  gap: 16px;
-  height: 100%; /* Garante que ocupe toda a altura disponível */
-}
-
-
-
-/* Mapa */
-.map-container {
-  flex-grow: 2; /* Ocupa a maior parte do bloco direito */
-  min-height: 400px;
-  
-}
 
 /*Search Bar */
 .search-bar-container {
   position: relative;
   width: 100%;
   max-width: 400px;
-  margin: 0 auto;
+  margin-top: 8px;
 }
 
 .search-bar {
@@ -195,6 +175,34 @@ body {
   font-size: 16px;
   border: 1px solid #ccc;
   border-radius: 5px;
+  outline: none;
+  background: transparent;
+  transition: border-color 0.3s ease;
+}
+
+.search-bar:focus {
+  border-color: #1A73E8; /* Amarelo dourado ao focar */
+}
+
+.search-label {
+  position: absolute;
+  top: 50%;
+  left: 12px;
+  transform: translateY(-50%);
+  font-size: 16px;
+  color: #666; /* Cinza médio */
+  background: white;
+  padding: 0 4px;
+  transition: all 0.3s ease;
+  pointer-events: none; /* Permite clicar no input através do label */
+}
+
+.search-bar:focus + .search-label,
+.search-bar:not(:placeholder-shown) + .search-label {
+  top: 0;
+  transform: translateY(-50%);
+  font-size: 12px;
+  color: #1A73E8; /* Azul primário */
 }
 
 .suggestions-list {

@@ -77,9 +77,9 @@ const KPI: React.FC = () => {
   return (
     <div className="kpi-container">
       {/* Título principal */}
-      <div className="kpi-main-title">
-        {selectedCity ? `Dados de ${selectedCity}` : "Dados do Estado"}
-      </div>
+      <h3 className="component-title">
+        {selectedCity ? `Indicadores de ${selectedCity}` : "Indicadores de Minas Gerais"}
+      </h3>
       {/* Valores e descrições */}
       <div className="kpi-grid">
         {/* Últimos 7 dias */}
@@ -101,7 +101,7 @@ const KPI: React.FC = () => {
           <p className="kpi-value">
             {formatNumber(currentData.yearlyCases)}
           </p>
-          <p className="kpi-subtitle">Acumulado</p>
+          <p className="kpi-subtitle">Acumulado no ano</p>
         </div>
 
         {/* Cidades em nível de alerta */}
@@ -114,7 +114,7 @@ const KPI: React.FC = () => {
       </div>
       {/* Data de obtenção dos dados */}
       <div className="kpi-footer">
-        Dados obtidos em {dataObtida}
+        Atualizado em {dataObtida}
       </div>
     </div>
   );

@@ -19,24 +19,26 @@ export default function Page() {
   }, [fetchStateData]);
 
   return (
-    <main className="main-container">
-      <header className="header">DengueMG - Dashboard de Dengue</header>
-      <div className="container">
-        {/* Sidebar (esquerda) */}
-        <aside className="sidebar">
-          <div className="kpi-container">
-            <KPI />
-          </div>
-          <SearchBar />
-          <BarChart />
-        </aside>
+    <>
+      <header className="header">
+        Painel de Monitoramento da Dengue
+      </header>
+      <main className="main-container">
+        <div className="container">
+          {/* Sidebar (esquerda) */}
+          <aside className="sidebar">
+              <KPI />
+            <SearchBar />
+            <BarChart />
+          </aside>
 
-        {/* Conteúdo principal (direita) */}
-        <section className="content">
-          <MapChart />
-          <LineChart />
-        </section>
-      </div>
-    </main>
+          {/* Conteúdo principal (direita) */}
+          <section className="content">
+            <MapChart />
+            <LineChart />
+          </section>
+        </div>
+      </main>
+    </>
   );
 }

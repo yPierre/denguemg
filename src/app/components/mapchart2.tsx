@@ -86,13 +86,13 @@ const MapChart2: React.FC = () => {
   const getColorByNivel = (nivel: number) => {
     switch (nivel) {
       case 1:
-        return "#00FF00FF"; // Verde
+        return "#4CAF50"; // Verde (baixo risco)
       case 2:
-        return "#FFFF00"; // Amarelo
+        return "#FFC107"; // Amarelo (médio risco)
       case 3:
-        return "#FFA500"; // Laranja
+        return "#FF9800"; // Laranja (alto risco)
       case 4:
-        return "#FF0000"; // Vermelho
+        return "#E53935"; // Vermelho (alerta máximo)
       default:
         return "#C8C8C8"; // Cinza (padrão)
     }
@@ -120,10 +120,10 @@ const MapChart2: React.FC = () => {
     const nivel = city ? city.nivel : 1;
     return {
       fillColor: getColorByNivel(nivel),
-      weight: 1,
+      weight: 0.5,
       opacity: 1,
       color: "#000",
-      fillOpacity: 0.5,
+      fillOpacity: 0.7,
     };
   };
 
@@ -161,50 +161,53 @@ const MapChart2: React.FC = () => {
   
 
   return (
-    <div style={{ height: "600px", width: "100%", position: "relative"}}>
-      <button className="reset-button"
-      onClick={handleResetToState}
-      style={{
-        position: "absolute",
-        zIndex: 1000,
-        backgroundColor: "#fff",
-        cursor: "pointer",
-      }}
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        viewBox="0 0 24 24"
-        width="20"
-        height="22"
-        fill="none"
-        stroke="currentColor"
-        strokeWidth="2"
-        strokeLinecap="round"
-        strokeLinejoin="round"
+    <>
+      <h3 className="component-title">Mapa de Alertas de Dengue</h3>
+      <div style={{ height: "600px", width: "100%", position: "relative"}}>
+        <button className="reset-button"
+        onClick={handleResetToState}
+        style={{
+          position: "absolute",
+          zIndex: 1000,
+          backgroundColor: "#fff",
+          cursor: "pointer",
+        }}
       >
-        <path d="M19 12H5M12 19l-7-7 7-7" />
-      </svg>
-    </button>
-      <MapContainer
-        center={[-18.5122, -44.555]} // Centro de Minas Gerais
-        zoom={6}
-        style={{ height: "100%", width: "100%" }}
-        ref={mapRef}
-      >
-        <TileLayer
-          url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-        />
-        {stateData && (
-          <GeoJSON
-            ref={geoJsonLayerRef} // Referência para a camada GeoJSON
-            data={geoData as GeoJSON.FeatureCollection}
-            style={styleFeature}
-            onEachFeature={onEachFeature}
+        <svg
+          xmlns="http://www.w3.org/2000/svg"
+          viewBox="0 0 24 24"
+          width="20"
+          height="22"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M19 12H5M12 19l-7-7 7-7" />
+        </svg>
+      </button>
+        <MapContainer
+          center={[-18.5122, -44.555]} // Centro de Minas Gerais
+          zoom={6}
+          style={{ height: "100%", width: "100%" }}
+          ref={mapRef}
+        >
+          <TileLayer
+            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
           />
-        )}
-      </MapContainer>
-    </div>
+          {stateData && (
+            <GeoJSON
+              ref={geoJsonLayerRef} // Referência para a camada GeoJSON
+              data={geoData as GeoJSON.FeatureCollection}
+              style={styleFeature}
+              onEachFeature={onEachFeature}
+            />
+          )}
+        </MapContainer>
+      </div>
+    </>
   );
 };
 

@@ -71,62 +71,65 @@ export default function BarChart2() {
   const getAlertColor = (nivel: number) => {
     switch (nivel) {
       case 1:
-        return "rgba(75, 192, 192, 0.6)"; // Verde (baixo risco)
+        return "#4CAF50"; // Verde (baixo risco)
       case 2:
-        return "rgba(255, 206, 86, 0.6)"; // Amarelo (médio risco)
+        return "#FFC107"; // Amarelo (médio risco)
       case 3:
-        return "rgba(255, 159, 64, 0.6)"; // Laranja (alto risco)
+        return "#FF9800"; // Laranja (alto risco)
       case 4:
-        return "rgba(255, 99, 132, 0.6)"; // Vermelho (alerta máximo)
+        return "#E53935"; // Vermelho (alerta máximo)
       default:
         return "rgba(200, 200, 200, 0.6)"; // Cinza (desconhecido)
     }
   };
 
   return (
-    <div className="barchart-container">
-      <div className="barchart-wrapper">
-        <Bar
-          data={chartData}
-          plugins={[ChartDataLabels]}
-          options={{
-            responsive: true,
-            maintainAspectRatio: false,
-            indexAxis: "y",
-            scales: {
-              x: {
-                title: { display: true, text: "Número de casos por cidade" },
-                beginAtZero: true,
-                ticks: {
-                  font: { size: 12 },
+    <>
+      <h3 className="component-title">Casos por Cidade</h3>
+      <div className="barchart-container">
+        <div className="barchart-wrapper">
+          <Bar
+            data={chartData}
+            plugins={[ChartDataLabels]}
+            options={{
+              responsive: true,
+              maintainAspectRatio: false,
+              indexAxis: "y",
+              scales: {
+                x: {
+                  title: { display: true, text: "Casos por cidade" },
+                  beginAtZero: true,
+                  ticks: {
+                    font: { size: 12 },
+                  },
+                },
+                y: {
+                  display: false,
                 },
               },
-              y: {
-                display: false,
-              },
-            },
-            plugins: {
-              legend: {
-                display: false,
-              },
-              datalabels: {
-                anchor: "start",
-                align: "end",
-                color: "black",
-                font: {
-                  size: 12,
-                  weight: "bold",
+              plugins: {
+                legend: {
+                  display: false,
                 },
-                formatter: (value, context) => {
-                  const labels = context.chart.data.labels as string[] | undefined;
-                  return labels ? `${labels[context.dataIndex]}: ${value}` : `${value}`;
+                datalabels: {
+                  anchor: "start",
+                  align: "end",
+                  color: "black",
+                  font: {
+                    size: 12,
+                    weight: "bold",
+                  },
+                  formatter: (value, context) => {
+                    const labels = context.chart.data.labels as string[] | undefined;
+                    return labels ? `${labels[context.dataIndex]}: ${value}` : `${value}`;
+                  },
+                  offset: 10,
                 },
-                offset: 10,
               },
-            },
-          }}
-        />
+            }}
+          />
+        </div>
       </div>
-    </div>
+    </>
   );
 }

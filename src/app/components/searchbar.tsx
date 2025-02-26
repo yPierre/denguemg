@@ -45,11 +45,13 @@ const SearchBar: React.FC = () => {
     <div className="search-bar-container">
       <input
         type="text"
-        placeholder="Buscar cidade..."
+        id="search"
+        placeholder=""
         value={query}
         onChange={handleInputChange}
         className="search-bar"
       />
+      <label htmlFor="search" className="search-label">Pesquisar cidade</label>
       {suggestions.length > 0 && (
         <ul className="suggestions-list">
           {suggestions.map((city, index) => (
