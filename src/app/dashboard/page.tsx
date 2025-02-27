@@ -21,13 +21,13 @@ export default function Page() {
   }, [fetchStateData]);
 
   return (
-    <>
+    <div className="main-container">
       <Header />
-      <main className="main-container">
+      <main className="main">
         <div className="container">
           {/* Sidebar (esquerda) */}
           <aside className="sidebar">
-              <KPI />
+            <KPI />
             <SearchBar />
             <BarChart />
           </aside>
@@ -39,6 +39,6 @@ export default function Page() {
           </section>
         </div>
       </main>
-    </>
+    </div>
   );
 }

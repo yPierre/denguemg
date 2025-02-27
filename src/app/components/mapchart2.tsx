@@ -41,6 +41,7 @@ const MapChart2: React.FC = () => {
   const [geoData, setGeoData] = useState<GeoFeatureCollection | null>(null);
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Referência para a camada GeoJSON
   const mapRef = useRef<L.Map | null>(null);
+  const [mapReady, setMapReady] = useState(false);
 
   // Função para dar zoom na cidade pesquisada
   useEffect(() => {
@@ -73,12 +74,26 @@ const MapChart2: React.FC = () => {
       .then((response) => response.json())
       .then((data) => {
         setGeoData(data);
+        setMapReady(true);
       })
       .catch((error) => console.error("Erro ao carregar o GeoJSON:", error));
   }, []);
 
+  useEffect(() => {
+    return () => {
+      if (geoJsonLayerRef.current) {
+        geoJsonLayerRef.current.clearLayers(); // Remove todas as camadas
+        geoJsonLayerRef.current = null;
+      }
+      if (mapRef.current) {
+        mapRef.current.remove(); // Garante a destruição do mapa
+        mapRef.current = null;
+      }
+    };
+  }, []);
+
   if (!geoData || !stateData) {
-    return <div>Carregando mapa...</div>;
+    return;
   }
   
 
@@ -138,11 +153,13 @@ const MapChart2: React.FC = () => {
       );
 
       layer.on("click", () => {
-        setSelectedCity(city.city); // Atualiza a cidade selecionada
+        setSelectedCity(city.city);
         
-        layer.on("add", (event) => {
-          const map = event.target._map; // Agora _map é acessível via evento
-          const bounds = (layer as L.Polygon).getBounds(); // Cast para L.Polygon (ou o tipo correto)
+        // Remove listeners anteriores para evitar acumulação
+        layer.off("add"); 
+        layer.once("add", (event) => { // Usar .once() para executar apenas uma vez
+          const map = event.target._map;
+          const bounds = (layer as L.Polygon).getBounds();
           map.flyToBounds(bounds, { padding: [50, 50], maxZoom: 7, duration: 1 });
         });
       });
@@ -161,13 +178,12 @@ const MapChart2: React.FC = () => {
   
 
   return (
-    <>
-      <h3 className="component-title">Mapa de Alertas de Dengue</h3>
-      <div style={{ height: "600px", width: "100%", position: "relative"}}>
+    <div className="map-container">
+      <h3 className="component-title">Mapa de Alertas de Dengue na Última Semana</h3>
+      <div className="map-outer">
         <button className="reset-button"
         onClick={handleResetToState}
         style={{
-          position: "absolute",
           zIndex: 1000,
           backgroundColor: "#fff",
           cursor: "pointer",
@@ -187,6 +203,8 @@ const MapChart2: React.FC = () => {
           <path d="M19 12H5M12 19l-7-7 7-7" />
         </svg>
       </button>
+      {!mapReady && <div>Carregando mapa...</div>}
+      {mapReady && (
         <MapContainer
           center={[-18.5122, -44.555]} // Centro de Minas Gerais
           zoom={6}
@@ -206,8 +224,16 @@ const MapChart2: React.FC = () => {
             />
           )}
         </MapContainer>
+      )}
+      <div className="legend">
+        <h4>Legenda:</h4>
+        <div><span style={{ backgroundColor: "#4CAF50" }}></span> Baixo Risco</div>
+        <div><span style={{ backgroundColor: "#FFC107" }}></span> Médio Risco</div>
+        <div><span style={{ backgroundColor: "#FF9800" }}></span> Alto Risco</div>
+        <div><span style={{ backgroundColor: "#E53935" }}></span> Alerta Máximo</div>
       </div>
-    </>
+      </div>
+    </div>
   );
 };
 

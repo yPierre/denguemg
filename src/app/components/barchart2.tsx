@@ -84,7 +84,7 @@ export default function BarChart2() {
   };
 
   return (
-    <>
+    <div className="barchart-component">
       <h3 className="component-title">Casos por Cidade</h3>
       <div className="barchart-container">
         <div className="barchart-wrapper">
@@ -130,6 +130,6 @@ export default function BarChart2() {
           />
         </div>
       </div>
-    </>
+    </div>
   );
 }
