@@ -12,7 +12,11 @@ import {
   Legend,
 } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
-import { useDataStore } from "@/store/dataStore"; // Importa o estado global
+import { useDataStore } from "@/store/dataStore";
+import Skeleton from "react-loading-skeleton"; // Importa o componente Skeleton
+import "react-loading-skeleton/dist/skeleton.css"; // Importa o CSS padrão
+
+Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
 interface CityData {
   city: string;
@@ -21,16 +25,9 @@ interface CityData {
   nivel: number;
 }
 
-Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
-
 export default function BarChart2() {
   const { stateData } = useDataStore(); // Pega os dados do estado global
-
-  // Extrai os dados atuais (posição 0 do array) ou define como null se não existir
   const currentStateData = stateData?.[0] || null;
-
-  useEffect(() => {
-  }, [currentStateData]);
 
   const [chartData, setChartData] = useState<{
     labels: string[];
@@ -83,6 +80,23 @@ export default function BarChart2() {
     }
   };
 
+  // Renderiza o skeleton enquanto os dados não estão disponíveis
+  if (!stateData) {
+    return (
+      <div className="barchart-component">
+        <h3 className="component-title">
+          <Skeleton/>
+        </h3>
+        <div className="barchart-container">
+          <div className="barchart-wrapper">
+            <Skeleton/>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // Renderiza o gráfico quando os dados estão prontos
   return (
     <div className="barchart-component">
       <h3 className="component-title">Casos por Cidade</h3>

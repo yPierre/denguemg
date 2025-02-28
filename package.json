@@ -11,6 +11,7 @@
   "dependencies": {
     "chart.js": "^4.4.7",
     "chartjs-chart-geo": "^4.3.4",
+    "chartjs-plugin-annotation": "^3.1.0",
     "chartjs-plugin-datalabels": "^2.2.0",
     "leaflet": "^1.9.4",
     "mongodb": "^6.13.0",

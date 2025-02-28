@@ -11,12 +11,12 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
+import annotationPlugin from "chartjs-plugin-annotation";
 import { useDataStore } from "@/store/dataStore";
 import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css"; // Importa o CSS padrão do skeleton
+import "react-loading-skeleton/dist/skeleton.css";
 
-// Registrar componentes do Chart.js
-Chart.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
+Chart.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend, annotationPlugin);
 
 interface StateDataEntry {
   SE: number;
@@ -44,8 +44,8 @@ export default function LineChart() {
       hidden: boolean;
     }[];
   } | null>(null);
+  const [latestWeek, setLatestWeek] = useState<number>(0);
 
-  // Processa os dados para o gráfico
   useEffect(() => {
     const data: DataEntry[] = cityData ? cityData[0].data : (stateData || []);
     if (!data) return;
@@ -60,12 +60,23 @@ export default function LineChart() {
       const year = Math.floor(entry.SE / 100);
       const week = entry.SE % 100;
       const totalCases = "casos" in entry ? entry.casos : entry.total_week_cases;
-      if (!groupedData[year]) {
-        groupedData[year] = Array(52).fill(null);
-      }
+      groupedData[year] = groupedData[year] || Array(52).fill(null);
       groupedData[year][week - 1] = totalCases;
     });
 
+    // Ordenar os anos do mais antigo para o mais recente
+    const years = Object.keys(groupedData).map(Number).sort((a, b) => a - b);
+    const latestYear = years.length > 0 ? years[years.length - 1] : null;
+
+    // Calcular semana mais recente
+    let latestWeekCalc = 0;
+    if (latestYear && groupedData[latestYear]) {
+      const latestYearData = groupedData[latestYear];
+      latestWeekCalc = latestYearData.findLastIndex((value) => value !== null);
+    }
+    setLatestWeek(latestWeekCalc);
+
+    // Cores
     const colors = [
       "rgba(75, 192, 192, 0.7)",
       "rgba(255, 99, 132, 0.7)",
@@ -77,21 +88,23 @@ export default function LineChart() {
       "rgba(75, 192, 192, 0.8)",
     ];
 
-    const datasets = Object.entries(groupedData).map(([year, cases], index) => {
-      return {
-        label: `${year}`,
-        data: cases,
-        fill: false,
-        borderColor: colors[index % colors.length],
-        backgroundColor: colors[index % colors.length],
-        pointRadius: 3,
-        hidden: false,
-      };
-    });
+    // Criar datasets ordenados do mais antigo para o mais recente
+    const datasets = years.map((year, index) => ({
+      label: `${year}`,
+      data: groupedData[year],
+      fill: false,
+      borderColor: colors[index % colors.length],
+      backgroundColor: colors[index % colors.length],
+      pointRadius: 3,
+      hidden: false,
+    }));
+
+    // Inverter a ordem dos datasets para renderizar o ano mais recente por cima
+    const reversedDatasets = [...datasets].reverse();
 
     setChartData({
       labels: Array.from({ length: 52 }, (_, i) => i + 1),
-      datasets,
+      datasets: reversedDatasets,
     });
   }, [stateData, cityData]);
 
@@ -135,6 +148,8 @@ export default function LineChart() {
               },
               plugins: {
                 legend: {
+                  reverse: true,
+                  // Remove a propriedade reverse para manter a ordem correta na legenda
                   onClick: (e, legendItem, legend) => {
                     const index = legendItem.datasetIndex;
                     if (index === undefined) return;
@@ -151,6 +166,25 @@ export default function LineChart() {
                       const datasetLabel = context.dataset.label || "";
                       const value = context.raw;
                       return `${datasetLabel}: ${value} casos`;
+                    },
+                  },
+                },
+                annotation: {
+                  annotations: {
+                    latestWeekLine: {
+                      type: "line",
+                      xMin: latestWeek,
+                      xMax: latestWeek,
+                      borderColor: "red",
+                      borderWidth: 2,
+                      label: {
+                        display: true,
+                        content: "Semana Atual",
+                        position: "end",
+                        backgroundColor: "rgba(255, 0, 0, 0.7)",
+                        color: "white",
+                        font: { size: 12 },
+                      },
                     },
                   },
                 },
