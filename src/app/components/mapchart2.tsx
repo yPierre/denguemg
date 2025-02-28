@@ -2,17 +2,19 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
+import Skeleton from "react-loading-skeleton";
 import "leaflet/dist/leaflet.css";
-import { useDataStore } from "@/store/dataStore"; // Importa o estado global
+import "react-loading-skeleton/dist/skeleton.css"; // Importa o CSS padrão do skeleton
+import { useDataStore } from "@/store/dataStore";
 import L from "leaflet";
 import { Feature, Geometry } from "geojson";
 
 // Definindo tipos para os dados geoespaciais
 interface GeoFeature {
-  type: "Feature"; // Defina o tipo como "Feature"
+  type: "Feature";
   properties: { name: string; id: number };
   geometry: {
-    type: "Polygon" | "MultiPolygon"; // Defina os tipos de geometria suportados
+    type: "Polygon" | "MultiPolygon";
     coordinates: number[][][];
   };
 }
@@ -34,35 +36,28 @@ interface CityData {
   nivel: number;
 }
 
-
-
 const MapChart2: React.FC = () => {
-  const { stateData, setSelectedCity, selectedCity } = useDataStore(); // Pega os dados do estado global
+  const { stateData, setSelectedCity, selectedCity } = useDataStore();
   const [geoData, setGeoData] = useState<GeoFeatureCollection | null>(null);
-  const geoJsonLayerRef = useRef<L.GeoJSON | null>(null); // Referência para a camada GeoJSON
+  const geoJsonLayerRef = useRef<L.GeoJSON | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const [mapReady, setMapReady] = useState(false);
 
   // Função para dar zoom na cidade pesquisada
   useEffect(() => {
     if (selectedCity && geoJsonLayerRef.current && stateData) {
-      // Encontra a cidade no stateData
       const city = stateData[0].cities.find((c: CityData) => c.city === selectedCity);
       if (city) {
-        // Encontra o feature correspondente no GeoJSON
         const feature = geoData?.features.find(
           (f) => Number(f.properties.id) === city.geocode
         );
-
         if (feature && geoJsonLayerRef.current) {
-          // Cria uma camada temporária para o feature
           const layer = L.geoJSON(feature);
           const bounds = layer.getBounds();
-
-          // Centraliza e dá zoom no mapa
           const map = mapRef.current;
-          if(map)
+          if (map) {
             map.flyToBounds(bounds, { padding: [50, 50], maxZoom: 7, duration: 1 });
+          }
         }
       }
     }
@@ -79,23 +74,33 @@ const MapChart2: React.FC = () => {
       .catch((error) => console.error("Erro ao carregar o GeoJSON:", error));
   }, []);
 
+  // Limpeza ao desmontar o componente
   useEffect(() => {
     return () => {
       if (geoJsonLayerRef.current) {
-        geoJsonLayerRef.current.clearLayers(); // Remove todas as camadas
+        geoJsonLayerRef.current.clearLayers();
         geoJsonLayerRef.current = null;
       }
       if (mapRef.current) {
-        mapRef.current.remove(); // Garante a destruição do mapa
+        mapRef.current.remove();
         mapRef.current = null;
       }
     };
   }, []);
 
+  // Renderiza o skeleton enquanto geoData ou stateData não estão prontos
   if (!geoData || !stateData) {
-    return;
+    return (
+      <div className="map-container">
+        <h3 className="component-title">
+          <Skeleton width={300} height={24} />
+        </h3>
+        <div className="map-outer">
+          <Skeleton height={400} />
+        </div>
+      </div>
+    );
   }
-  
 
   // Função para definir as cores com base no nível de alerta
   const getColorByNivel = (nivel: number) => {
@@ -121,117 +126,120 @@ const MapChart2: React.FC = () => {
 
   // Estilo dos municípios
   const styleFeature = (feature: Feature<Geometry, GeoFeatureProperties> | undefined) => {
-    // Se o feature for undefined, retorne um estilo padrão
     if (!feature) {
       return {
-        fillColor: "#C8C8C8", // Cinza (padrão)
+        fillColor: "#C8C8C8",
         weight: 1,
         opacity: 1,
         color: "#000",
-        fillOpacity: 0.5,
+        fillOpacity: 0.8,
       };
     }
     const city = citiesMap.get(Number(feature.properties.id));
     const nivel = city ? city.nivel : 1;
+    const isSelected = selectedCity === city?.city;
+    const fillOpacity = selectedCity ? (isSelected ? 1 : 0.5) : 0.7;
     return {
       fillColor: getColorByNivel(nivel),
-      weight: 0.5,
+      weight: isSelected ? 1 : 0.5,
       opacity: 1,
       color: "#000",
-      fillOpacity: 0.7,
+      fillOpacity,
     };
   };
 
   // Tooltip e evento de clique para cada município
   const onEachFeature = (feature: Feature<Geometry, GeoFeatureProperties>, layer: L.Layer) => {
     const city = citiesMap.get(Number(feature.properties.id));
-
     if (city) {
       layer.bindTooltip(
         `<strong>${feature.properties.name}</strong><br>Casos: ${city.casos}`,
         { permanent: false, sticky: true }
       );
-
       layer.on("click", () => {
         setSelectedCity(city.city);
-        
-        // Remove listeners anteriores para evitar acumulação
-        layer.off("add"); 
-        layer.once("add", (event) => { // Usar .once() para executar apenas uma vez
+        layer.off("add");
+        layer.once("add", (event) => {
           const map = event.target._map;
           const bounds = (layer as L.Polygon).getBounds();
-          map.flyToBounds(bounds, { padding: [50, 50], maxZoom: 7, duration: 1 });
+          map.flyToBounds(bounds, { padding: [50, 50], maxZoom: 9, duration: 1 });
         });
       });
     }
   };
 
-
   const handleResetToState = () => {
-    setSelectedCity(null); // Redefine a cidade selecionada
+    setSelectedCity(null);
     if (mapRef.current) {
       const map = mapRef.current;
-      map.flyTo([-18.5122, -44.555], 6, { duration: 1 }); // Volta ao zoom inicial
+      map.flyTo([-18.5122, -44.555], 6, { duration: 1 });
     }
   };
-
-  
 
   return (
     <div className="map-container">
       <h3 className="component-title">Mapa de Alertas de Dengue na Última Semana</h3>
       <div className="map-outer">
-        <button className="reset-button"
-        onClick={handleResetToState}
-        style={{
-          zIndex: 1000,
-          backgroundColor: "#fff",
-          cursor: "pointer",
-        }}
-      >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          width="20"
-          height="22"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
+        <button
+          className="reset-button"
+          onClick={handleResetToState}
+          style={{
+            zIndex: 1000,
+            backgroundColor: "#fff",
+            cursor: "pointer",
+          }}
         >
-          <path d="M19 12H5M12 19l-7-7 7-7" />
-        </svg>
-      </button>
-      {!mapReady && <div>Carregando mapa...</div>}
-      {mapReady && (
-        <MapContainer
-          center={[-18.5122, -44.555]} // Centro de Minas Gerais
-          zoom={6}
-          style={{ height: "100%", width: "100%" }}
-          ref={mapRef}
-        >
-          <TileLayer
-            url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-            attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
-          />
-          {stateData && (
-            <GeoJSON
-              ref={geoJsonLayerRef} // Referência para a camada GeoJSON
-              data={geoData as GeoJSON.FeatureCollection}
-              style={styleFeature}
-              onEachFeature={onEachFeature}
+          <svg
+            xmlns="http://www.w3.org/2000/svg"
+            viewBox="0 0 24 24"
+            width="20"
+            height="22"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M19 12H5M12 19l-7-7 7-7" />
+          </svg>
+        </button>
+        {!mapReady && <div>Carregando mapa...</div>}
+        {mapReady && (
+          <MapContainer
+            center={[-18.5122, -44.555]}
+            zoom={6}
+            style={{ height: "100%", width: "100%" }}
+            ref={mapRef}
+          >
+            <TileLayer
+              url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+              attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
             />
-          )}
-        </MapContainer>
-      )}
+            {stateData && (
+              <GeoJSON
+                ref={geoJsonLayerRef}
+                data={geoData as GeoJSON.FeatureCollection}
+                style={styleFeature}
+                onEachFeature={onEachFeature}
+              />
+            )}
+          </MapContainer>
+        )}
+      </div>
       <div className="legend">
         <h4>Legenda:</h4>
-        <div><span style={{ backgroundColor: "#4CAF50" }}></span> Baixo Risco</div>
-        <div><span style={{ backgroundColor: "#FFC107" }}></span> Médio Risco</div>
-        <div><span style={{ backgroundColor: "#FF9800" }}></span> Alto Risco</div>
-        <div><span style={{ backgroundColor: "#E53935" }}></span> Alerta Máximo</div>
-      </div>
+        <div>
+          <span style={{ backgroundColor: "#4CAF50" }}></span> Baixo Risco
+        </div>
+        <div>
+          <span style={{ backgroundColor: "#FFC107" }}></span> Médio Risco
+        </div>
+        <div>
+          <span style={{ backgroundColor: "#FF9800" }}></span> Alto Risco
+        </div>
+        <div>
+          <span style={{ backgroundColor: "#E53935" }}></span> Alerta Máximo
+        </div>
       </div>
     </div>
   );

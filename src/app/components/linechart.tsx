@@ -11,7 +11,12 @@ import {
   Tooltip,
   Legend,
 } from "chart.js";
-import { useDataStore } from "@/store/dataStore"; // Importa o estado global
+import { useDataStore } from "@/store/dataStore";
+import Skeleton from "react-loading-skeleton";
+import "react-loading-skeleton/dist/skeleton.css"; // Importa o CSS padrão do skeleton
+
+// Registrar componentes do Chart.js
+Chart.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
 
 interface StateDataEntry {
   SE: number;
@@ -25,11 +30,8 @@ interface CityDataEntry {
 
 type DataEntry = StateDataEntry | CityDataEntry;
 
-// Registrar componentes do Chart.js
-Chart.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend);
-
 export default function LineChart() {
-  const { stateData, cityData } = useDataStore(); // Pega os dados do estado global e da cidade
+  const { stateData, cityData } = useDataStore();
   const [chartData, setChartData] = useState<{
     labels: number[];
     datasets: {
@@ -45,66 +47,66 @@ export default function LineChart() {
 
   // Processa os dados para o gráfico
   useEffect(() => {
-    const data: DataEntry[] = cityData ? cityData[0].data : (stateData || []); // Usa cityData se disponível, senão stateData
-
+    const data: DataEntry[] = cityData ? cityData[0].data : (stateData || []);
     if (!data) return;
 
-    // Extrair os dados de semanas epidemiológicas (SE) e casos
     const seData: DataEntry[] = data.map((entry) => ({
       SE: entry.SE,
-      total_week_cases: "casos" in entry ? entry.casos : entry.total_week_cases, // Ajusta o campo de casos
+      total_week_cases: "casos" in entry ? entry.casos : entry.total_week_cases,
     }));
 
-    // Agrupar dados por ano
     const groupedData: { [year: number]: number[] } = {};
     seData.forEach((entry) => {
-      const year = Math.floor(entry.SE / 100); // Ex: 202452 -> 2024
-      const week = entry.SE % 100; // Ex: 202452 -> 52
-    
-      // Garante que o total_week_cases existe no entry, independente do tipo
+      const year = Math.floor(entry.SE / 100);
+      const week = entry.SE % 100;
       const totalCases = "casos" in entry ? entry.casos : entry.total_week_cases;
-    
       if (!groupedData[year]) {
-        groupedData[year] = Array(52).fill(null); // Cria um array com 52 semanas (inicialmente nulo)
+        groupedData[year] = Array(52).fill(null);
       }
-    
-      groupedData[year][week - 1] = totalCases; // Insere os casos na semana correspondente
+      groupedData[year][week - 1] = totalCases;
     });
 
-    // Nova paleta de cores
     const colors = [
-      "rgba(75, 192, 192, 0.7)", // Azul esverdeado
-      "rgba(255, 99, 132, 0.7)", // Vermelho rosado
-      "rgba(54, 162, 235, 0.7)", // Azul claro
-      "rgba(255, 159, 64, 0.7)", // Laranja
-      "rgba(153, 102, 255, 0.7)", // Roxo
-      "#1A73E8", // Amarelo | 2025 -> atualizado para azul
-      "rgba(201, 203, 207, 0.8)", // Cinza
-      "rgba(75, 192, 192, 0.8)", // Azul esverdeado (repetido para mais anos)
+      "rgba(75, 192, 192, 0.7)",
+      "rgba(255, 99, 132, 0.7)",
+      "rgba(54, 162, 235, 0.7)",
+      "rgba(255, 159, 64, 0.7)",
+      "rgba(153, 102, 255, 0.7)",
+      "#1A73E8",
+      "rgba(201, 203, 207, 0.8)",
+      "rgba(75, 192, 192, 0.8)",
     ];
 
-    // Criar datasets para cada ano
     const datasets = Object.entries(groupedData).map(([year, cases], index) => {
       return {
         label: `${year}`,
         data: cases,
         fill: false,
-        borderColor: colors[index % colors.length], // Usa a paleta de cores
+        borderColor: colors[index % colors.length],
         backgroundColor: colors[index % colors.length],
         pointRadius: 3,
-        hidden: false, // Inicialmente, todas as linhas estão visíveis
+        hidden: false,
       };
     });
 
     setChartData({
-      labels: Array.from({ length: 52 }, (_, i) => i + 1), // Semanas de 1 a 52
+      labels: Array.from({ length: 52 }, (_, i) => i + 1),
       datasets,
     });
-  }, [stateData, cityData]); // Atualiza o gráfico sempre que `stateData` ou `cityData` mudar
+  }, [stateData, cityData]);
 
-  // Exibe um indicador de carregamento enquanto os dados estão sendo buscados
+  // Renderiza o skeleton enquanto os dados estão sendo buscados
   if (!stateData && !cityData) {
-    return <p className="text-center">⏳ Carregando dados...</p>;
+    return (
+      <div className="linechart-c">
+        <h3 className="component-title">
+          <Skeleton width={200} height={24} />
+        </h3>
+        <div className="linechart-container">
+          <Skeleton height={300} />
+        </div>
+      </div>
+    );
   }
 
   return (
@@ -119,8 +121,8 @@ export default function LineChart() {
               responsive: true,
               maintainAspectRatio: false,
               interaction: {
-                mode: "index", // Permite interagir com múltiplos datasets ao mesmo tempo
-                intersect: false, // Exibe o tooltip ao passar o mouse sobre a linha
+                mode: "index",
+                intersect: false,
               },
               scales: {
                 x: {
@@ -136,17 +138,15 @@ export default function LineChart() {
                   onClick: (e, legendItem, legend) => {
                     const index = legendItem.datasetIndex;
                     if (index === undefined) return;
-
                     const chart = legend.chart;
                     const meta = chart.getDatasetMeta(index);
                     meta.hidden = !meta.hidden;
-
                     chart.update();
                   },
                 },
                 tooltip: {
                   callbacks: {
-                    title: (context) => `Semana ${context[0].label}`, // Título do tooltip
+                    title: (context) => `Semana ${context[0].label}`,
                     label: (context) => {
                       const datasetLabel = context.dataset.label || "";
                       const value = context.raw;
@@ -159,7 +159,9 @@ export default function LineChart() {
           />
         </div>
       ) : (
-        <p className="text-center">⏳ Carregando dados...</p>
+        <div className="linechart-container">
+          <Skeleton height={300} />
+        </div>
       )}
     </div>
   );

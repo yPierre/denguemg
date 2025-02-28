@@ -111,7 +111,6 @@ body {
   background-color: white;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
-  height: 250px;
 }
 
 .kpi-main-title {
@@ -160,7 +159,8 @@ body {
 }
 
 .kpi-footer {
-  margin-top: 16px;
+  margin-top: 8px;
+  margin-bottom: 4px;
   font-size: 14px;
   color: #666;
   text-align: center;
@@ -211,13 +211,21 @@ body {
 /*Search Bar */
 .search-bar-container {
   position: relative;
+  display: flex;
+  justify-content: center;
   width: 100%;
   max-width: 400px;
   margin-top: 8px;
 }
 
+.search-bar-wrapper {
+  position: relative;
+  display: flex;
+  width: 90%; /* Mesma largura do campo de texto */
+}
+
 .search-bar {
-  width: 90%;
+  width: 100%;
   padding: 8px;
   font-size: 16px;
   border: 1px solid #ccc;
@@ -254,6 +262,7 @@ body {
 
 .suggestions-list {
   position: absolute;
+  top: 100%;
   width: 100%;
   max-height: 200px;
   overflow-y: auto;
@@ -299,6 +308,7 @@ body {
 /*Leaflet*/
 
 .leaflet-interactive:focus {
+  transition: fill-opacity 0.3s ease;
   outline: none !important; /* Remove sombras ao focar */
 }
 
@@ -306,7 +316,7 @@ body {
   position: absolute;
   bottom: 30px;
   right: 10px;
-  background: white;
+  background: rgba(255, 255, 255, 0.5);
   padding: 10px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);

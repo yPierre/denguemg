@@ -43,28 +43,30 @@ const SearchBar: React.FC = () => {
 
   return (
     <div className="search-bar-container">
-      <input
-        type="text"
-        id="search"
-        placeholder=""
-        value={query}
-        onChange={handleInputChange}
-        className="search-bar"
-      />
-      <label htmlFor="search" className="search-label">Pesquisar cidade</label>
-      {suggestions.length > 0 && (
-        <ul className="suggestions-list">
-          {suggestions.map((city, index) => (
-            <li
-              key={index}
-              onClick={() => handleSelectCity(city)}
-              className="suggestion-item"
-            >
-              {city}
-            </li>
-          ))}
-        </ul>
-      )}
+      <div className="search-bar-wrapper">
+        <input
+          type="text"
+          id="search"
+          placeholder=""
+          value={query}
+          onChange={handleInputChange}
+          className="search-bar"
+        />
+        <label htmlFor="search" className="search-label">Pesquisar cidade</label>
+        {suggestions.length > 0 && (
+          <ul className="suggestions-list">
+            {suggestions.map((city, index) => (
+              <li
+                key={index}
+                onClick={() => handleSelectCity(city)}
+                className="suggestion-item"
+              >
+                {city}
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 };
