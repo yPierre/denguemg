@@ -20,15 +20,73 @@ body {
   height: 100vh;
 }
 
+/* Header */
+.header {
+  width: 100%;
+  height: 6vh;
+  display: flex;
+  justify-content: space-between;
+  background: linear-gradient(135deg, #1A73E8, #63B4FF);
+  color: #fff;
+  text-align: center;
+  font-size: 24px;
+  font-weight: bold;
+  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.1);
+  position: relative; /* Garante que o header respeite o fluxo normal */
+  z-index: 10; /* Para ficar acima de outros elementos */
+  padding: 0 15px;
+  overflow: hidden; /* Impede que o texto vaze */
+}
+
+
+.logo-component {
+  display: flex;
+  align-items: center;
+  gap: 10px; /* Espaço entre o logo e o texto */
+  min-width: 140px; /* Largura mínima para o logo + nome */
+}
+
+.logo {
+  border-radius: 5px; /* Estilo opcional para o logo */
+}
+
+.site-name {
+  font-size: 1.2rem;
+  font-weight: bold;
+}
+
+.header-title{
+  position: absolute;
+  left: 50%; /* Move o título para o centro horizontal */
+  top: 50%; /* Move o título para o centro vertical */
+  transform: translate(-50%, -50%); /* Ajusta o posicionamento para o centro exato */
+  font-size: 1.4rem;
+  white-space: nowrap; /* Mantém em linha única */
+  overflow: hidden;
+  text-overflow: ellipsis; /* Adiciona "..." se o texto for cortado */
+  max-width: 60%;
+  transition: all 0.3s ease;
+}
+
+.full-title {
+  display: inline;
+}
+
+.short-title {
+  display: none;
+}
+
 .main{
-  flex-grow: 1;
+  height: 94vh;
 }
 
 .container {
   display: flex;
   justify-content: center;
   width: 100vw;
-  height: 94vh;
+  height: 100%;
+  flex-wrap: nowrap; /* Novo */
+  overflow: hidden; /* Novo */
 }
 
 /* Sidebar deve ocupar toda a altura da tela sem empurrar o conteúdo */
@@ -65,6 +123,7 @@ body {
   flex-direction: column;
   height: 100%; /* Ocupa toda a altura do grid */
   width: 80%;
+  min-height: 0;
 }
 
 /* Mapa */
@@ -72,7 +131,8 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
-  flex: 0 0 65%;
+  flex: 0 0 65%; /* Modificado */
+  min-height: 400px; /* Novo */
 }
 
 .map-outer{
@@ -87,7 +147,7 @@ body {
 }
 
 .linechart-container {
-  flex-grow: 1;
+  height: 100%;
 }
 
 
@@ -164,47 +224,6 @@ body {
   font-size: 14px;
   color: #666;
   text-align: center;
-}
-
-/* Header */
-.header {
-  width: 100%;
-  height: 5%;
-  display: flex;
-  justify-content: flex-start;
-  background: linear-gradient(135deg, #1A73E8, #63B4FF);
-  color: #fff;
-  text-align: center;
-  font-size: 24px;
-  font-weight: bold;
-  box-shadow: inset 0 -2px 4px rgba(0, 0, 0, 0.1);
-  position: relative; /* Garante que o header respeite o fluxo normal */
-  z-index: 10; /* Para ficar acima de outros elementos */
-}
-
-
-.logo-component {
-  display: flex;
-  align-items: center;
-  gap: 10px; /* Espaço entre o logo e o texto */
-  padding-left: 10px; /* Espaçamento interno */
-  border-radius: 5px; /* Cantos arredondados */
-}
-
-.logo {
-  border-radius: 5px; /* Estilo opcional para o logo */
-}
-
-.site-name {
-  font-size: 1.2rem;
-  font-weight: bold;
-}
-
-.header-title{
-  position: absolute;
-  left: 50%; /* Move o título para o centro horizontal */
-  top: 50%; /* Move o título para o centro vertical */
-  transform: translate(-50%, -50%); /* Ajusta o posicionamento para o centro exato */
 }
 
 
@@ -345,47 +364,134 @@ body {
 
 /* Responsividade */
 @media (max-width: 1024px) {
-  .container {body {
-  max-width: 100vw;
-  overflow-x: hidden;
-  color: var(--foreground);
-  background: var(--background);
-  font-family: Arial, Helvetica, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  height: 100vh;
-}
 
-
-/* Responsividade */
-@media (max-width: 1024px) {
+  
   .container {
-    grid-template-areas:
-      "sidebar"
-      "content";
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
+    flex-direction: column;
+    height: auto;
+    min-height: 94vh;
+  }
+
+  .sidebar, .content {
+    width: 100%;
+    height: auto;
   }
 
   .sidebar {
-    flex-direction: row;
+    flex-direction: column;
+    gap: 15px;
+    padding: 10px 5px;
+  }
+
+  /* Garante que os componentes do sidebar ocupem a largura total */
+  .sidebar > * {
+    width: 100% !important;
+    min-width: 100% !important;
+  }
+
+  .barchart-container,
+  .map-outer {
+    min-height: 300px;
+    height: 50vh;
+  }
+
+  .header {
+    padding: 0 10px;
+  }
+
+  .header-title {
+    font-size: 1.2rem;
+    max-width: 50%;
+  }
+
+  /* Reordenação dos componentes */
+  .sidebar, .content {
+    width: 100%;
+    display: contents; /* Faz com que os filhos sejam tratados como filhos diretos do container */
+  }
+
+
+
+
+  .sidebar > .kpi-container {
+    order: 1;
+  }
+
+  .sidebar > .search-bar-container {
+    order: 2;
+  }
+
+  .content > .map-container {
+    order: 3;
+  }
+
+  .content > .linechart-c {
+    order: 4;
+  }
+
+  .sidebar > .barchart-component {
+    order: 5;
+  }
+
+}
+
+@media (max-width: 768px) {
+  .header-title {
+    white-space: normal; /* Permite quebra de linha */
+    max-width: 45%;
+    text-align: center;
+  }
+
+  .full-title {
+    display: none;
+  }
+  
+  .short-title {
+    display: inline;
   }
 }
 
-    grid-template-areas:
-      "sidebar"
-      "content";
-    grid-template-columns: 1fr;
-    grid-template-rows: auto;
+@media (max-width: 480px) {
+  /* Ajustes finos para telas muito pequenas */
+  .barchart-container,
+  .map-outer,
+  .linechart-container {
+    min-height: 250px;
+    height: 45vh;
+  }
+  
+  .kpi-value {
+    font-size: 20px !important;
   }
 
-  .sidebar {
-    flex-direction: row;
+  .header {
+    flex-wrap: wrap; /* Permite quebra de linha */
+    justify-content: center;
+    gap: 5px;
+    padding: 5px;
+  }
+  
+  .header-title {
+    font-size: 0.9rem;
+    max-width: 100%;
+    order: 2; /* Coloca o título embaixo em mobile */
+    text-align: center;
+    white-space: nowrap;
+  }
+  
+  .logo-component {
+    order: 1; /* Logo fica acima em mobile */
+  }
+
+  .full-title {
+    display: none;
+  }
+  
+  .short-title {
+    display: inline;
   }
 }
+
 
 @media (min-width: 2560px) {
   .container {

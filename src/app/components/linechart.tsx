@@ -194,7 +194,7 @@ export default function LineChart() {
         </div>
       ) : (
         <div className="linechart-container">
-          <Skeleton height={300} />
+          <Skeleton height={250} />
         </div>
       )}
     </div>
