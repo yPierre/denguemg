@@ -3,6 +3,7 @@
 import React, { useEffect, useState, useRef } from "react";
 import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import Skeleton from "react-loading-skeleton";
+import { Tooltip as ReactTooltip } from 'react-tooltip';
 import "leaflet/dist/leaflet.css";
 import "react-loading-skeleton/dist/skeleton.css"; // Importa o CSS padrão do skeleton
 import { useDataStore } from "@/store/dataStore";
@@ -187,11 +188,8 @@ const MapChart: React.FC = () => {
         <button
           className="reset-button"
           onClick={handleResetToState}
-          style={{
-            zIndex: 1000,
-            backgroundColor: "#fff",
-            cursor: "pointer",
-          }}
+          data-tooltip-id="reset-button-tooltip-id"
+          data-tooltip-content="Resetar para visão do estado"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -206,13 +204,18 @@ const MapChart: React.FC = () => {
           >
             <path d="M19 12H5M12 19l-7-7 7-7" />
           </svg>
+          <ReactTooltip 
+            id="reset-button-tooltip-id"
+            className="reset-button-tooltip"
+            place="bottom"
+          />
         </button>
         {!mapReady && <div>Carregando mapa...</div>}
         {mapReady && (
           <MapContainer
             center={[-18.5122, -44.555]}
             zoom={6}
-            style={{ height: "100%", width: "100%", borderRadius: "5px" }}
+            style={{ height: "100%", width: "100%", borderRadius: "5px", boxShadow: "0px 2px 8px rgba(0,0,0,0.1)" }}
             ref={mapRef}
           >
             <TileLayer
