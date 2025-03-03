@@ -10,7 +10,7 @@ import SearchBar from "../components/searchbar";
 import Header from "../components/header";
 
 
-const MapChart = dynamic(() => import("../components/mapchart2"), {
+const MapChart = dynamic(() => import("../components/mapchart"), {
   ssr: false, // Desativa a renderização no servidor para este componente
 });
 export default function Page() {

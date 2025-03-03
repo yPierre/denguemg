@@ -1,5 +1,7 @@
 import { create } from "zustand";
 
+type DataType = 'absolute' | 'per100k' | 'weekly' | 'accumulated';
+
 interface Week{
   Rt: number;
   SE: number;
@@ -34,14 +36,17 @@ interface DataState {
   selectedCity: string | null;
   loading: boolean;
   loadingCity: boolean;
+  dataType: DataType;
   fetchStateData: () => Promise<void>;
   fetchCityData: (city: string) => Promise<void>;
   setSelectedCity: (city: string | null) => void;
+  
 }
 
 export const useDataStore = create<DataState>((set) => ({
   stateData: null,
   cityData: null,
+  dataType: 'absolute',
   selectedCity: null,
   loading: false,
   loadingCity: false,

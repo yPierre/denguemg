@@ -2,7 +2,7 @@ body {
   max-width: 100vw;
   overflow-x: hidden;
   color: #4A4A4A;
-  background: #F9F9F9;
+  background: #ff4949;
   font-family: Arial, Helvetica, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
@@ -95,12 +95,16 @@ body {
   flex-direction: column;
   height: 100%;
   width: 15%;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .barchart-component{
   display: flex;
   flex-direction: column;
+  margin: 5px;
   flex-grow: 1;
+  border-radius: 5px;
+  background-color: #ffffff;
   overflow: hidden;
 }
 
@@ -108,7 +112,6 @@ body {
 /* Gráfico de barras ocupando todo o espaço disponível abaixo */
 .barchart-container {
   height: 100%;
-  background-color: #ffffff;
   overflow: hidden;
 }
 
@@ -124,6 +127,7 @@ body {
   height: 100%; /* Ocupa toda a altura do grid */
   width: 80%;
   min-height: 0;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 /* Mapa */
@@ -131,22 +135,38 @@ body {
   position: relative;
   display: flex;
   flex-direction: column;
-  flex: 0 0 65%; /* Modificado */
-  min-height: 400px; /* Novo */
+  margin: 5px;
+  background-color: #ffffff;
+  border-radius: 5px;
+  box-sizing: border-box;
+  flex: 0 0 calc(60% - 10px);
 }
 
 .map-outer{
   flex-grow: 1; /* Ocupa a maior parte do bloco direito */
+  border-radius: 5px;
 }
+
 
 /* Gráfico de linhas */
 .linechart-c{
   display: flex;
   flex-direction: column;
-  flex: 0 0 35%;
+  margin: 5px;
+  border-radius: 5px;
+  background-color: #ffffff;
+  box-sizing: border-box;
+  flex: 0 0 calc(40% - 10px);
 }
 
+
+
 .linechart-container {
+  height: 100%;
+  overflow: hidden;
+}
+
+.linechart-wrapper {
   height: 100%;
 }
 
@@ -163,13 +183,32 @@ body {
   height: 42px;
 }
 
+.chart-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin: 0px 8px;
+}
+
+.chart-title{
+  margin: 0;
+  font-size: 18px;
+  color: #333;
+}
+
+.chart-controls {
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
 
 /* KPI */
 /* Estilos para o componente KPI */
 .kpi-container {
-  margin: 0rem 0.5rem;
+  margin: 5px;
   background-color: white;
-  border-radius: 8px;
+  border-radius: 5px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
@@ -232,15 +271,17 @@ body {
   position: relative;
   display: flex;
   justify-content: center;
-  width: 100%;
   max-width: 400px;
-  margin-top: 8px;
+  background-color: #ffffff;
+  margin: 5px;
+  border-radius: 5px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 .search-bar-wrapper {
   position: relative;
   display: flex;
-  width: 90%; /* Mesma largura do campo de texto */
+  width: 100%; /* Mesma largura do campo de texto */
 }
 
 .search-bar {
@@ -288,10 +329,11 @@ body {
   background-color: #fff;
   border: 1px solid #ccc;
   border-top: none;
+  box-sizing: border-box;
   border-radius: 0 0 5px 5px;
   list-style: none;
-  padding: 0;
-  margin: 0;
+  padding: 0px;
+  margin: 0px;
   z-index: 1000;
 }
 
@@ -359,6 +401,70 @@ body {
   height: 12px;
   margin-right: 5px;
   border-radius: 2px;
+}
+
+.legend-gradient {
+  width: 100%;
+  margin: 8px 0;
+}
+
+.legend span {
+  font-size: 0.8em;
+}
+
+/*toggle*/
+.toggle-switch-container {
+  margin: 8px;
+}
+
+.toggle-button {
+  display: flex;
+  align-items: center;
+  padding: 0.3rem 0.6rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 25px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.toggle-button:hover {
+  border-color: #1A73E8;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.toggle-button.toggled {
+  background: #f8f8f8;
+}
+
+.toggle-button.toggled:hover {
+  border-color: #9966ff;
+}
+
+.toggle-label {
+  font-weight: 500;
+  color: #333;
+  margin-right: 0.5rem;
+}
+
+.toggle-chevron {
+  font-size: 0.9em;
+  color: #1A73E8;
+  transition: transform 0.3s ease;
+}
+
+
+.toggle-button.toggled .toggle-chevron {
+  transform: rotate(180deg);
+  color: #9966ff;
+}
+
+.tooltip-custom {
+  z-index: 1000;
+  font-size: 0.8rem !important;
+  padding: 0.5rem 1rem !important;
+  border-radius: 4px !important;
+  background: #333 !important;
 }
 
 

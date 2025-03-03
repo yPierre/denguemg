@@ -12,6 +12,7 @@ import {
   Legend,
 } from "chart.js";
 import ChartDataLabels from "chartjs-plugin-datalabels";
+import ChartHeader from "./chartheader";
 import { useDataStore } from "@/store/dataStore";
 import Skeleton from "react-loading-skeleton"; // Importa o componente Skeleton
 import "react-loading-skeleton/dist/skeleton.css"; // Importa o CSS padrão
@@ -99,7 +100,21 @@ export default function BarChart2() {
   // Renderiza o gráfico quando os dados estão prontos
   return (
     <div className="barchart-component">
-      <h3 className="component-title">Casos por Cidade</h3>
+      <ChartHeader
+        title="Cidades"
+        toggleOptions={[
+          {
+            type: 'absolute',
+            label: 'Absoluto',
+            tooltip: 'Mostra o número total de casos reportados'
+          },
+          {
+            type: 'per100k',
+            label: 'Por 100k',
+            tooltip: 'Mostra casos proporcionalmente à população'
+          }
+        ]}
+      />
       <div className="barchart-container">
         <div className="barchart-wrapper">
           <Bar

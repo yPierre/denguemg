@@ -13,6 +13,7 @@ import {
 } from "chart.js";
 import annotationPlugin from "chartjs-plugin-annotation";
 import { useDataStore } from "@/store/dataStore";
+import ChartHeader from "./chartheader";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 
@@ -124,10 +125,25 @@ export default function LineChart() {
 
   return (
     <div className="linechart-c">
-      <h3 className="component-title">Casos Semanais por Ano</h3>
+      <ChartHeader
+        title="Casos Semanais por Ano"
+        toggleOptions={[
+          {
+            type: 'weekly',
+            label: 'Casos Semanais por ano',
+            tooltip: 'Mostra o número de casos semanais reportados'
+          },
+          {
+            type: 'accumulated',
+            label: 'Casos Acumulados por ano',
+            tooltip: 'Mostra o número de casos acumulados por ano reportados'
+          }
+        ]}
+      />
 
       {chartData ? (
         <div className="linechart-container">
+          <div className="linechart-wrapper">
           <Line
             data={chartData}
             options={{
@@ -191,6 +207,7 @@ export default function LineChart() {
               },
             }}
           />
+          </div>
         </div>
       ) : (
         <div className="linechart-container">
