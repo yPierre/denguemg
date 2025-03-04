@@ -11,14 +11,15 @@ interface ChartHeaderProps {
     label: string;
     tooltip: string;
   }[];
+  onToggleChange: (type: 'absolute' | 'per100k' | 'weekly' | 'accumulated') => void; 
 }
 
-const ChartHeader: React.FC<ChartHeaderProps> = ({ title, toggleOptions }) => {
+const ChartHeader: React.FC<ChartHeaderProps> = ({ title, toggleOptions, onToggleChange  }) => {
   return (
     <div className="chart-header">
       <h3 className="chart-title">{title}</h3>
       <div className="chart-controls">
-        <ToggleSwitch options={toggleOptions} />
+      <ToggleSwitch options={toggleOptions} onToggleChange={onToggleChange} />
       </div>
     </div>
   );

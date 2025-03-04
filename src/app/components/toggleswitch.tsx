@@ -1,8 +1,6 @@
-// components/ToggleSwitch.tsx
 "use client";
 
 import React, { useState } from 'react';
-import { useDataStore } from '@/store/dataStore';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 
 interface ToggleSwitchProps {
@@ -11,17 +9,19 @@ interface ToggleSwitchProps {
     label: string;
     tooltip: string;
   }[];
+  onToggleChange: (type: 'absolute' | 'per100k' | 'weekly' | 'accumulated') => void;
 }
 
-const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ options }) => {
-  const { dataType, setDataType } = useDataStore();
+const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ options, onToggleChange }) => {
   const [isToggled, setIsToggled] = useState(false);
-  const currentOption = options[isToggled ? 1 : 0];
 
   const handleToggle = () => {
-    setIsToggled(!isToggled);
-    setDataType(currentOption.type);
+    const newState = !isToggled;
+    setIsToggled(newState);
+    onToggleChange(options[newState ? 1 : 0].type);
   };
+
+  const currentOption = options[isToggled ? 1 : 0];
 
   return (
     <div className="toggle-switch-container">
@@ -34,6 +34,7 @@ const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ options }) => {
         <span className="toggle-label">{currentOption.label}</span>
         <span className="toggle-chevron">{isToggled ? '◀' : '▶'}</span>
       </button>
+      
       <ReactTooltip 
         id="toggle-tooltip"
         className="tooltip-custom"

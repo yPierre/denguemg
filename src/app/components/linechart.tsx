@@ -22,17 +22,20 @@ Chart.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, L
 interface StateDataEntry {
   SE: number;
   total_week_cases: number;
+  total_notif_accum_year: number;
 }
 
 interface CityDataEntry {
   SE: number;
   casos: number;
+  notif_accum_year: number;
 }
 
 type DataEntry = StateDataEntry | CityDataEntry;
 
 export default function LineChart() {
   const { stateData, cityData } = useDataStore();
+  const [dataType, setDataType] = useState<'absolute' | 'per100k' | 'weekly' | 'accumulated'>('weekly');
   const [chartData, setChartData] = useState<{
     labels: number[];
     datasets: {
@@ -49,20 +52,23 @@ export default function LineChart() {
 
   useEffect(() => {
     const data: DataEntry[] = cityData ? cityData[0].data : (stateData || []);
-    if (!data) return;
+    if (!data || data.length === 0) return;
 
-    const seData: DataEntry[] = data.map((entry) => ({
-      SE: entry.SE,
-      total_week_cases: "casos" in entry ? entry.casos : entry.total_week_cases,
-    }));
+    const sortedData = [...data].sort((a, b) => a.SE - b.SE);
+
+    const isCity = sortedData.length > 0 && 'casos' in sortedData[0];
+    const valueKey = dataType === 'accumulated' 
+      ? (isCity ? 'notif_accum_year' : 'total_notif_accum_year') 
+      : (isCity ? 'casos' : 'total_week_cases');
 
     const groupedData: { [year: number]: number[] } = {};
-    seData.forEach((entry) => {
+    sortedData.forEach((entry) => {
       const year = Math.floor(entry.SE / 100);
       const week = entry.SE % 100;
-      const totalCases = "casos" in entry ? entry.casos : entry.total_week_cases;
+      const value = entry[valueKey as keyof DataEntry] as number;
+
       groupedData[year] = groupedData[year] || Array(52).fill(null);
-      groupedData[year][week - 1] = totalCases;
+      groupedData[year][week - 1] = value;
     });
 
     // Ordenar os anos do mais antigo para o mais recente
@@ -107,7 +113,7 @@ export default function LineChart() {
       labels: Array.from({ length: 52 }, (_, i) => i + 1),
       datasets: reversedDatasets,
     });
-  }, [stateData, cityData]);
+  }, [stateData, cityData, dataType]);
 
   // Renderiza o skeleton enquanto os dados estão sendo buscados
   if (!stateData && !cityData) {
@@ -139,6 +145,7 @@ export default function LineChart() {
             tooltip: 'Mostra o número de casos acumulados por ano reportados'
           }
         ]}
+        onToggleChange={(type) => setDataType(type)}
       />
 
       {chartData ? (
@@ -181,7 +188,9 @@ export default function LineChart() {
                     label: (context) => {
                       const datasetLabel = context.dataset.label || "";
                       const value = context.raw;
-                      return `${datasetLabel}: ${value} casos`;
+                      return dataType === 'accumulated'
+                        ? `${datasetLabel}: ${value} casos acumulados`
+                        : `${datasetLabel}: ${value} casos`;
                     },
                   },
                 },

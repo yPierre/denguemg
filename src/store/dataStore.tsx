@@ -18,7 +18,11 @@ interface CityData {
   city: string;
   geocode: number;
   casos: number;
+  p_inc100k: number;
   nivel: number;
+  notif_accum_year: number;
+  receptivo: number;
+  transmissao: number;
   data: Week[];
 }
 
@@ -27,6 +31,7 @@ interface StateData {
   total_week_cases: number;
   total_pop: number;
   cities_in_alert_state: number;
+  total_notif_accum_year: number;
   cities: CityData[];
 }
 
@@ -40,6 +45,7 @@ interface DataState {
   fetchStateData: () => Promise<void>;
   fetchCityData: (city: string) => Promise<void>;
   setSelectedCity: (city: string | null) => void;
+  setDataType: (type: DataType) => void;
   
 }
 
@@ -50,6 +56,7 @@ export const useDataStore = create<DataState>((set) => ({
   selectedCity: null,
   loading: false,
   loadingCity: false,
+  setDataType: (type) => set({ dataType: type }),
 
   // Busca os dados do estado
   fetchStateData: async () => {
