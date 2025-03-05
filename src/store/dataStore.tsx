@@ -1,38 +1,65 @@
 import { create } from "zustand";
+import { adaptCityData } from '../utils/dataAdapter';
 
 type DataType = 'absolute' | 'per100k' | 'weekly' | 'accumulated';
 
-interface Week{
-  Rt: number;
-  SE: number;
-  casos: number;
-  nivel: number;
-  nivel_inc: number;
-  notif_accum_year: number;
-  p_inc100k: number;
-  p_rt1: number;
-  //colocar mais itens aqui dps
-}
-
-interface CityData {
+export interface CityWeekData {
   city: string;
   geocode: number;
   casos: number;
+  p_rt1: number;
   p_inc100k: number;
   nivel: number;
-  notif_accum_year: number;
+  nivel_inc: number;
+  Rt: number;
+  pop: number;
+  tempmin: number;
+  tempmed: number;
+  tempmax: number;
+  umidmin: number;
+  umidmed: number;
+  umidmax: number;
   receptivo: number;
   transmissao: number;
+  notif_accum_year: number;
+}
+
+export interface Week{
+  SE: number;
+  casos: number;
+  p_rt1: number;
+  p_inc100k: number;
+  nivel: number;
+  nivel_inc: number;
+  Rt: number;
+  pop: number;
+  tempmin: number;
+  tempmed: number;
+  tempmax: number;
+  umidmin: number;
+  umidmed: number;
+  umidmax: number;
+  receptivo: number;
+  transmissao: number;
+  notif_accum_year: number;
+}
+
+export interface CityData {
+  city: string;
+  geocode: number;
+  casos: number;
+  nivel: number;
+  p_inc100k: number;
   data: Week[];
 }
 
-interface StateData {
+export interface StateData {
   SE: number;
   total_week_cases: number;
   total_pop: number;
   cities_in_alert_state: number;
   total_notif_accum_year: number;
-  cities: CityData[];
+  cities: CityWeekData[];
 }
 
 interface DataState {
@@ -76,10 +103,11 @@ export const useDataStore = create<DataState>((set) => ({
     set({ loadingCity: true });
     //console.log("City(fetchCityData):", city);
     try {
-      const response = await fetch(`/api/cities?city=${city}`);
+      const response = await fetch(`/api/state?city=${city}`);
       const data = await response.json();
-      console.log("CityData(dataStore):", data); // Verifique se os dados estão chegando
-      set({ cityData: data, loadingCity: false });
+      const adaptedData = adaptCityData(city, data);
+      console.log("CityData(dataStore):", adaptedData); // Verifique se os dados estão chegando
+      set({ cityData: [adaptedData], loadingCity: false });
     } catch (error) {
       console.error("Erro ao buscar dados da cidade(dataStore):", error);
       set({ loadingCity: false });
