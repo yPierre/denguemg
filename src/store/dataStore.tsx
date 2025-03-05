@@ -1,5 +1,4 @@
 import { create } from "zustand";
-import { adaptCityData } from '../utils/dataAdapter';
 
 type DataType = 'absolute' | 'per100k' | 'weekly' | 'accumulated';
 
@@ -101,18 +100,16 @@ export const useDataStore = create<DataState>((set) => ({
   // Busca os dados da cidade
   fetchCityData: async (city) => {
     set({ loadingCity: true });
-    //console.log("City(fetchCityData):", city);
     try {
       const response = await fetch(`/api/state?city=${city}`);
       const data = await response.json();
-      const adaptedData = adaptCityData(city, data);
-      console.log("CityData(dataStore):", adaptedData); // Verifique se os dados estão chegando
-      set({ cityData: [adaptedData], loadingCity: false });
+      console.log("CityData(dataStore):", data); // Verifique os dados retornados
+      set({ cityData: [data], loadingCity: false });
     } catch (error) {
       console.error("Erro ao buscar dados da cidade(dataStore):", error);
       set({ loadingCity: false });
     }
-  },
+},
 
   // Define a cidade selecionada
   setSelectedCity: (city) => {
