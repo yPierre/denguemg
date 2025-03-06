@@ -46,9 +46,6 @@ export interface Week{
 export interface CityData {
   city: string;
   geocode: number;
-  casos: number;
-  nivel: number;
-  p_inc100k: number;
   data: Week[];
 }
 
@@ -103,7 +100,6 @@ export const useDataStore = create<DataState>((set) => ({
     try {
       const response = await fetch(`/api/state?city=${city}`);
       const data = await response.json();
-      console.log("CityData(dataStore):", data); // Verifique os dados retornados
       set({ cityData: [data], loadingCity: false });
     } catch (error) {
       console.error("Erro ao buscar dados da cidade(dataStore):", error);

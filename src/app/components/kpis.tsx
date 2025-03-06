@@ -3,7 +3,7 @@
 import React from "react";
 import { useDataStore } from "@/store/dataStore";
 import Skeleton from "react-loading-skeleton";
-import "react-loading-skeleton/dist/skeleton.css"; // Importa o CSS padrão
+import "react-loading-skeleton/dist/skeleton.css";
 
 // Função para formatar números com separadores de milhar
 const formatNumber = (number: number | null | undefined) => {
@@ -13,6 +13,23 @@ const formatNumber = (number: number | null | undefined) => {
   return number.toLocaleString("pt-BR");
 };
 
+// Função para calcular a data a partir de SE
+const getDateFromSE = (se: number) => {
+  const seStr = se.toString().padStart(6, "0"); // Garante formato "YYYYWW"
+  const year = parseInt(seStr.substring(0, 4));
+  const week = parseInt(seStr.substring(4, 6));
+  const firstDayOfYear = new Date(year, 0, 1);
+  const dayOfWeek = firstDayOfYear.getDay() - 1;
+  const firstMondayOffset = (8 - dayOfWeek) % 7 || 7;
+  const firstMonday = new Date(firstDayOfYear);
+  firstMonday.setDate(firstDayOfYear.getDate() + firstMondayOffset - 1);
+  const seMonday = new Date(firstMonday);
+  seMonday.setDate(firstMonday.getDate() + (week - 1) * 7);
+  const day = String(seMonday.getDate()).padStart(2, "0");
+  const month = String(seMonday.getMonth() + 1).padStart(2, "0");
+  return `${day}/${month}/${seMonday.getFullYear()}`;
+};
+
 const KPI: React.FC = () => {
   const { stateData, cityData, selectedCity } = useDataStore();
 
@@ -20,46 +37,39 @@ const KPI: React.FC = () => {
   let se: number = 0;
 
   if (cityData && cityData[0]) {
-    console.log("cityData[0] em KPIS.tsx:", cityData[0]);
-    currentData = {
-      cases: cityData[0].data[0].casos,
-      last30DaysCases: cityData[0].data
-        .slice(0, 4)
-        .reduce((total, item) => total + item.casos, 0),
-      yearlyCases: cityData[0].data
-        .filter((item) =>
-          item.SE.toString().startsWith(cityData[0].data[0].SE.toString().slice(0, 4))
-        )
-        .reduce((total, item) => total + item.casos, 0),
-    };
-    se = cityData[0].data[0].SE;
-  } else if (stateData && stateData[0]) {
-    currentData = {
-      cases: stateData[0].total_week_cases,
-      last30DaysCases: stateData
-        .slice(0, 4)
-        .reduce((total, item) => total + item.total_week_cases, 0),
-      yearlyCases: stateData
-        .filter((item) =>
-          item.SE.toString().startsWith(stateData[0].SE.toString().slice(0, 4))
-        )
-        .reduce((total, item) => total + item.total_week_cases, 0),
-    };
-    se = stateData[0].SE;
-  }
+    // Ordena por SE decrescente para ter a semana mais recente primeiro
+    const sortedCityHistory = [...cityData[0].data].sort((a, b) => b.SE - a.SE);
+    const latestCityData = sortedCityHistory[0];
+    se = latestCityData.SE;
 
-  const getDateFromSE = (se: number) => {
-    const year = parseInt(se.toString().substring(0, 4));
-    const week = parseInt(se.toString().substring(4, 6));
-    const firstDayOfYear = new Date(year, 0, 1);
-    const firstMonday = new Date(firstDayOfYear);
-    firstMonday.setDate(firstDayOfYear.getDate() + ((1 - firstDayOfYear.getDay() + 7) % 7));
-    const seMonday = new Date(firstMonday);
-    seMonday.setDate(firstMonday.getDate() + (week - 1) * 7);
-    const day = String(seMonday.getDate()).padStart(2, "0");
-    const month = String(seMonday.getMonth() + 1).padStart(2, "0");
-    return `${day}/${month}/${seMonday.getFullYear()}`;
-  };
+    currentData = {
+      cases: latestCityData.casos,
+      last30DaysCases: sortedCityHistory
+        .slice(0, 4)
+        .reduce((total, item) => total + item.casos, 0),
+      yearlyCases: sortedCityHistory
+        .filter((item) => item.SE.toString().startsWith(se.toString().slice(0, 4)))
+        .reduce((total, item) => total + item.casos, 0),
+    };
+  } else if (stateData && stateData[0]) {
+    const latestStateData = stateData[0];
+    se = latestStateData.SE;
+
+    // Remove duplicatas de stateData antes de calcular
+    const uniqueStateData = stateData.filter(
+      (item, index, self) => self.findIndex((i) => i.SE === item.SE) === index
+    );
+    const sortedHistoricalData = [...uniqueStateData].sort((a, b) => b.SE - a.SE);
+    const last4Weeks = sortedHistoricalData.slice(0, 4); // Pega as 4 semanas mais recentes
+
+    currentData = {
+      cases: latestStateData.total_week_cases,
+      last30DaysCases: last4Weeks.reduce((total, item) => total + item.total_week_cases, 0),
+      yearlyCases: uniqueStateData
+        .filter((item) => item.SE.toString().startsWith(se.toString().slice(0, 4)))
+        .reduce((total, item) => total + item.total_week_cases, 0),
+    };
+  }
 
   // Renderiza o skeleton se currentData for null
   if (currentData === null) {
