@@ -10,10 +10,7 @@ export function adaptCityData(cityName: string, stateData: StateData[]): CityDat
   // Filtra e transforma os dados
   const adaptedData: CityData = {
     city: cityName,
-    casos: 0,
     geocode: 0, // Será preenchido abaixo
-    nivel: 0,
-    p_inc100k: 0,
     data: []
   };
 
@@ -23,9 +20,6 @@ export function adaptCityData(cityName: string, stateData: StateData[]): CityDat
       // Preenche o geocode na primeira iteração
       if (adaptedData.geocode === 0) {
         adaptedData.geocode = cityInWeek.geocode;
-        adaptedData.casos = cityInWeek.casos;
-        adaptedData.nivel = cityInWeek.nivel;
-        adaptedData.p_inc100k = cityInWeek.p_inc100k;
       }
 
       // Adiciona os dados da semana
