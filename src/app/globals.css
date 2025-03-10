@@ -111,12 +111,15 @@ body {
 
 /* Gráfico de barras ocupando todo o espaço disponível abaixo */
 .barchart-container {
-  height: 100%;
+  flex: 1;
+  display: flex;
   overflow: hidden;
 }
 
 .barchart-wrapper {
   height: 100%;
+  width: 95%;
+  padding: 0 15px 15px;
 }
 
 
@@ -261,9 +264,17 @@ body {
 }
 
 .kpi-footer {
+  border-top: 1px solid #F9F9F9;
   margin-top: 8px;
+  font-size: 12px;
+  color: #666;
+  text-align: center;
+}
+
+.chart-footer {
+  margin-top: 2px;
   margin-bottom: 4px;
-  font-size: 14px;
+  font-size: 12px;
   color: #666;
   text-align: center;
 }
@@ -371,15 +382,16 @@ body {
 
 .reset-button-toooltip {
   background: #333;
-  color: #fff;
+  color: #a02929;
   padding: 8px 12px;
   border-radius: 4px;
-  font-size: 1rem;
+  font-size: 0.8rem;
   z-index: 9000;
 }
 
 .reset-button-toooltip::after{
-  border-top-color: #333;
+  font-size: 1rem;
+  border-top-color: #ca2727;
 }
 
 /*Leaflet*/
@@ -576,10 +588,13 @@ body {
 @media (max-width: 480px) {
   /* Ajustes finos para telas muito pequenas */
   .barchart-container,
-  .map-outer,
-  .linechart-container {
+  .map-outer {
     min-height: 250px;
     height: 45vh;
+  }
+
+  .barchart-wrapper {
+    width: 100%;
   }
   
   .kpi-value {
@@ -588,21 +603,23 @@ body {
 
   .header {
     flex-wrap: wrap; /* Permite quebra de linha */
-    justify-content: center;
+    justify-content: space-between;
     gap: 5px;
     padding: 5px;
   }
   
   .header-title {
-    font-size: 0.9rem;
-    max-width: 100%;
-    order: 2; /* Coloca o título embaixo em mobile */
+    white-space: normal; /* Permite quebra de linha */
+    max-width: 45%;
     text-align: center;
-    white-space: nowrap;
   }
   
   .logo-component {
     order: 1; /* Logo fica acima em mobile */
+  }
+
+  .site-name{
+    display: none;
   }
 
   .full-title {

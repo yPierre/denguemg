@@ -4,6 +4,7 @@ import React from "react";
 import { useDataStore } from "@/store/dataStore";
 import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
+import ChartFooter from "./chartfooter";
 
 // Função para formatar números com separadores de milhar
 const formatNumber = (number: number | null | undefined) => {
@@ -107,15 +108,15 @@ const KPI: React.FC = () => {
       <div className="kpi-grid">
         <div className="kpi-item">
           <p className="kpi-value">{formatNumber(currentData.cases)}</p>
-          <p className="kpi-subtitle">Últimos 7 dias</p>
+          <p className="kpi-subtitle">Casos na última semana</p>
         </div>
         <div className="kpi-item">
           <p className="kpi-value">{formatNumber(currentData.last30DaysCases)}</p>
-          <p className="kpi-subtitle">Últimos 30 dias</p>
+          <p className="kpi-subtitle">Casos nas últimas 4 semanas</p>
         </div>
         <div className="kpi-item">
           <p className="kpi-value">{formatNumber(currentData.yearlyCases)}</p>
-          <p className="kpi-subtitle">Acumulado no ano</p>
+          <p className="kpi-subtitle">Casos no ano</p>
         </div>
         <div className="kpi-item">
           <p className="kpi-value kpi-alert-value">
@@ -123,10 +124,11 @@ const KPI: React.FC = () => {
               ? formatNumber(stateData[0].cities_in_alert_state)
               : "N/A"}
           </p>
-          <p className="kpi-subtitle">Cidades em nível de alerta</p>
+          <p className="kpi-subtitle">Cidades em alerta</p>
         </div>
       </div>
-      <div className="kpi-footer">Atualizado em {dataObtida}</div>
+      <div className="kpi-footer">Dados atualizados em {dataObtida}</div>
+      <ChartFooter/>
     </div>
   );
 };

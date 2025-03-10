@@ -189,7 +189,7 @@ const MapChart: React.FC = () => {
           className="reset-button"
           onClick={handleResetToState}
           data-tooltip-id="reset-button-tooltip-id"
-          data-tooltip-content="Resetar para visão do estado"
+          data-tooltip-content="Voltar à visão estadual"
         >
           <svg
             xmlns="http://www.w3.org/2000/svg"
@@ -206,7 +206,7 @@ const MapChart: React.FC = () => {
           </svg>
           <ReactTooltip 
             id="reset-button-tooltip-id"
-            className="reset-button-tooltip"
+            className="tooltip-custom"
             place="bottom"
           />
         </button>
@@ -240,7 +240,7 @@ const MapChart: React.FC = () => {
             height: "20px",
             borderRadius: "4px"
         }}/>
-        <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <div style={{ display: "flex", justifyContent: "space-between", padding: "5px" }}>
             <span>0</span>
             <span>{maxCasos}</span>
         </div>

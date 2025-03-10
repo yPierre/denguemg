@@ -52,7 +52,7 @@ export default function BarChart2() {
     // Ordena cidades por número de casos e pega as 15 com mais casos
     const sortedCities = currentStateData.cities
       .sort((a: CityData, b: CityData) => b[dataField] - a[dataField])
-      .slice(0, 15);
+      .slice(0, 10);
 
     const labels = sortedCities.map((city: CityData) => city.city);
     const dataValues = sortedCities.map((city: CityData) => 
@@ -158,13 +158,13 @@ export default function BarChart2() {
         toggleOptions={[
           {
             type: 'absolute',
-            label: 'Absoluto',
-            tooltip: 'Mostra o número total de casos reportados'
+            label: 'Total de Casos',
+            tooltip: 'Mostrar o número total de casos reportados nas cidades.'
           },
           {
             type: 'per100k',
-            label: 'Por 100k',
-            tooltip: 'Mostra casos proporcionalmente à população'
+            label: 'Por 100 mil habitantes',
+            tooltip: 'Mostrar o número de casos por 100.000 habitantes, ajustado pela população das cidades.'
           }
         ]}
         onToggleChange={(type) => setDataType(type)}

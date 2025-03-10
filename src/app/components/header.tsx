@@ -16,7 +16,7 @@ const Header: React.FC = () => {
                 <span className="site-name">DengueMG</span>
             </div>
             <span className="header-title">
-                <span className="full-title">Painel de Monitoramento da Dengue</span>
+                <span className="full-title">Painel de Monitoramento da Dengue em Minas Gerais</span>
                 <span className="short-title">Painel Dengue</span>
             </span>
         </header>
