@@ -15,6 +15,7 @@ import annotationPlugin from "chartjs-plugin-annotation";
 import { useDataStore } from "@/store/dataStore";
 import ChartHeader from "./chartheader";
 import Skeleton from "react-loading-skeleton";
+import ToggleSwitch from "./toggleswitch";
 import "react-loading-skeleton/dist/skeleton.css";
 
 Chart.register(LineElement, CategoryScale, LinearScale, PointElement, Tooltip, Legend, annotationPlugin);
@@ -131,22 +132,23 @@ export default function LineChart() {
 
   return (
     <div className="linechart-c">
-      <ChartHeader
-        title="Casos Semanais por Ano"
-        toggleOptions={[
-          {
-            type: 'weekly',
-            label: 'Casos Semanais por ano',
-            tooltip: 'Mostra o número de casos semanais reportados'
-          },
-          {
-            type: 'accumulated',
-            label: 'Casos Acumulados por ano',
-            tooltip: 'Mostra o número de casos acumulados por ano reportados'
-          }
-        ]}
-        onToggleChange={(type) => setDataType(type)}
-      />
+      <ChartHeader title="Casos Semanais por Ano">
+        <ToggleSwitch
+          options={[
+            {
+              type: 'weekly',
+              label: 'Casos Semanais por ano',
+              tooltip: 'Mostra o número de casos semanais reportados'
+            },
+            {
+              type: 'accumulated',
+              label: 'Casos Acumulados por ano',
+              tooltip: 'Mostra o número de casos acumulados por ano reportados'
+            }
+          ]}
+          onToggleChange={(type) => setDataType(type)}
+        />
+      </ChartHeader>
 
       {chartData ? (
         <div className="linechart-container">

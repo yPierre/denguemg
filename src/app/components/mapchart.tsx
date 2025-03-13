@@ -5,12 +5,14 @@ import { MapContainer, TileLayer, GeoJSON } from "react-leaflet";
 import Skeleton from "react-loading-skeleton";
 import { Tooltip as ReactTooltip } from 'react-tooltip';
 import "leaflet/dist/leaflet.css";
-import "react-loading-skeleton/dist/skeleton.css"; // Importa o CSS padrão do skeleton
+import "react-loading-skeleton/dist/skeleton.css";
 import { useDataStore } from "@/store/dataStore";
 import L from "leaflet";
 import { Feature, Geometry } from "geojson";
+import LayerSelector from "./layerselector";
+import ChartHeader from "./chartheader";
+import { LayerOption } from "./layerselector";
 
-// Definindo tipos para os dados geoespaciais
 interface GeoFeature {
   type: "Feature";
   properties: { name: string; id: number };
@@ -35,6 +37,7 @@ interface CityData {
   geocode: number;
   casos: number;
   nivel: number;
+  p_inc100k: number;
 }
 
 const MapChart: React.FC = () => {
@@ -44,8 +47,8 @@ const MapChart: React.FC = () => {
   const mapRef = useRef<L.Map | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [maxCasos, setMaxCasos] = useState(0);
+  const [visualization, setVisualization] = useState<'casos' | 'nivel' | 'incidencia'>('casos');
 
-  // Função para dar zoom na cidade pesquisada
   useEffect(() => {
     if (selectedCity && geoJsonLayerRef.current && stateData) {
       const city = stateData[0].cities.find((c: CityData) => c.city === selectedCity);
@@ -65,7 +68,6 @@ const MapChart: React.FC = () => {
     }
   }, [selectedCity, geoData, stateData]);
 
-  // Carregar o GeoJSON de Minas Gerais
   useEffect(() => {
     fetch("/geojs-31-mun.json")
       .then((response) => response.json())
@@ -84,7 +86,6 @@ const MapChart: React.FC = () => {
     }
   }, [stateData]);
 
-  // Limpeza ao desmontar o componente
   useEffect(() => {
     return () => {
       if (geoJsonLayerRef.current) {
@@ -98,7 +99,6 @@ const MapChart: React.FC = () => {
     };
   }, []);
 
-  // Renderiza o skeleton enquanto geoData ou stateData não estão prontos
   if (!geoData || !stateData) {
     return (
       <div className="map-container">
@@ -112,24 +112,45 @@ const MapChart: React.FC = () => {
     );
   }
 
-  // Função para definir as cores com base no nível de alerta
   const getColorByCasos = (casos: number) => {
-    if (maxCasos === 0) return '#FFEBEE'; // Vermelho claro padrão
+    if (maxCasos === 0) return '#FFEBEE';
     const ratio = casos / maxCasos;
-    // Interpola entre vermelho claro (#FFEBEE) e escuro (#B71C1C)
     const red = Math.floor(255 - (255 - 183) * ratio);
     const green = Math.floor(235 - (235 - 28) * ratio);
     const blue = Math.floor(238 - (238 - 28) * ratio);
     return `rgb(${red}, ${green}, ${blue})`;
   };
 
-  // Mapear os dados das cidades para o GeoJSON
+  const getColorByNivel = (nivel: number) => {
+    switch (nivel) {
+      case 1:
+        return "#4CAF50";
+      case 2:
+        return "#FFC107";
+      case 3:
+        return "#FF9800";
+      case 4:
+        return "#E53935";
+      default:
+        return "#C8C8C8";
+    }
+  };
+
+  const getColorByIncidencia = (incidencia: number) => {
+    if (incidencia >= 300) return "#800020"; // Vinho
+    if (incidencia >= 200) return "#FF0000"; // Vermelho
+    if (incidencia >= 100) return "#FF4500"; // Laranja escuro
+    if (incidencia >= 50) return "#FFA500"; // Laranja claro
+    if (incidencia >= 10) return "#FFD700"; // Amarelo escuro
+    if (incidencia >= 0) return "#FFFF99"; // Amarelo claro
+    return "#C8C8C8"; // Cinza (default, para valores inválidos)
+  };
+
   const citiesMap = new Map<number, CityData>();
   stateData[0].cities.forEach((city: CityData) => {
     citiesMap.set(city.geocode, city);
   });
 
-  // Estilo dos municípios
   const styleFeature = (feature: Feature<Geometry, GeoFeatureProperties> | undefined) => {
     if (!feature) {
       return {
@@ -141,11 +162,18 @@ const MapChart: React.FC = () => {
       };
     }
     const city = citiesMap.get(Number(feature.properties.id));
-    //const nivel = city ? city.nivel : 1;
     const isSelected = selectedCity === city?.city;
     const fillOpacity = selectedCity ? (isSelected ? 1 : 0.5) : 0.7;
+    let fillColor;
+    if (visualization === 'casos') {
+      fillColor = getColorByCasos(city?.casos || 0);
+    } else if (visualization === 'nivel') {
+      fillColor = getColorByNivel(city?.nivel || 0);
+    } else {
+      fillColor = getColorByIncidencia(city?.p_inc100k || 0); // Assume que p_inc100k está nos dados
+    }
     return {
-        fillColor: getColorByCasos(city?.casos || 0),
+      fillColor,
       weight: isSelected ? 1 : 0.5,
       opacity: 1,
       color: "#000",
@@ -153,22 +181,20 @@ const MapChart: React.FC = () => {
     };
   };
 
-  // Tooltip e evento de clique para cada município
   const onEachFeature = (feature: Feature<Geometry, GeoFeatureProperties>, layer: L.Layer) => {
     const city = citiesMap.get(Number(feature.properties.id));
     if (city) {
-      layer.bindTooltip(
-        `<strong>${feature.properties.name}</strong><br>Casos: ${city.casos}`,
-        { permanent: false, sticky: true }
-      );
+      let tooltipContent;
+      if (visualization === 'casos') {
+        tooltipContent = `<strong>${feature.properties.name}</strong><br>Casos de dengue na última semana: ${city.casos}`;
+      } else if (visualization === 'nivel') {
+        tooltipContent = `<strong>${feature.properties.name}</strong><br>Nível de Alerta: ${city.nivel}`;
+      } else {
+        tooltipContent = `<strong>${feature.properties.name}</strong><br>Incidência por 100 mil habitantes: ${city.p_inc100k.toFixed(2)}`;
+      }
+      layer.bindTooltip(tooltipContent, { permanent: false, sticky: true });
       layer.on("click", () => {
         setSelectedCity(city.city);
-        layer.off("add");
-        layer.once("add", (event) => {
-          const map = event.target._map;
-          const bounds = (layer as L.Polygon).getBounds();
-          map.flyToBounds(bounds, { padding: [50, 50], maxZoom: 9, duration: 1 });
-        });
       });
     }
   };
@@ -181,9 +207,36 @@ const MapChart: React.FC = () => {
     }
   };
 
+  const layerOptions: LayerOption[] = [
+    {
+      type: 'casos',
+      label: 'Casos',
+      tooltip: 'Exibir mapa com base nos casos de dengue'
+    },
+    {
+      type: 'nivel',
+      label: 'Nível de Alerta',
+      tooltip: 'Exibir mapa com base no nível de alerta'
+    },
+    {
+      type: 'incidencia',
+      label: 'Incidência por 100k',
+      tooltip: 'Exibir mapa com base na incidência por 100 mil habitantes'
+    }
+  ];
+  
+  const handleLayerChange = (type: 'casos' | 'nivel' | 'incidencia') => {
+    setVisualization(type);
+  };
+
   return (
     <div className="map-container">
-      <h3 className="component-title">Mapa de Alertas de Dengue na Última Semana</h3>
+      <ChartHeader title="Mapa de Alertas de Dengue na Última Semana">
+        <LayerSelector
+          options={layerOptions}
+          onLayerChange={handleLayerChange}
+        />
+      </ChartHeader>
       <div className="map-outer">
         <button
           className="reset-button"
@@ -224,6 +277,7 @@ const MapChart: React.FC = () => {
             />
             {stateData && (
               <GeoJSON
+                key={`${visualization}-${selectedCity || 'none'}`} // Força re-renderização
                 ref={geoJsonLayerRef}
                 data={geoData as GeoJSON.FeatureCollection}
                 style={styleFeature}
@@ -233,18 +287,72 @@ const MapChart: React.FC = () => {
           </MapContainer>
         )}
       </div>
-      <div className="legend">
-      <h4>Intensidade de Casos</h4>
-        <div className="legend-gradient" style={{
-            background: "linear-gradient(to right, #FFEBEE, #B71C1C)",
-            height: "20px",
-            borderRadius: "4px"
-        }}/>
-        <div style={{ display: "flex", justifyContent: "space-between", padding: "5px" }}>
+      {visualization === 'casos' ? (
+        <div className="legend">
+          <h4>Intensidade de Casos</h4>
+          <div className="legend-gradient" />
+          <div className="legend-range">
             <span>0</span>
             <span>{maxCasos}</span>
+          </div>
         </div>
-      </div>
+      ) : visualization === 'nivel' ? (
+        <div className="legend">
+          <h4>Nível de Alerta</h4>
+          <div className="legend-items">
+            <div className="legend-item">
+              <div className="legend-color nivel-1" />
+              <span>Nível 1</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color nivel-2" />
+              <span>Nível 2</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color nivel-3" />
+              <span>Nível 3</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color nivel-4" />
+              <span>Nível 4</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color nivel-unknown" />
+              <span>Desconhecido</span>
+            </div>
+          </div>
+        </div>
+      ) : (
+        <div className="legend">
+          <h4>Incidência por 100 mil</h4>
+          <div className="legend-items">
+            <div className="legend-item">
+              <div className="legend-color incidencia-0-10" />
+              <span>0-10</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color incidencia-10-50" />
+              <span>10-50</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color incidencia-50-100" />
+              <span>50-100</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color incidencia-100-200" />
+              <span>100-200</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color incidencia-200-300" />
+              <span>200-300</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color incidencia-300-plus" />
+              <span>300+</span>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 };

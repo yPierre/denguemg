@@ -2,25 +2,17 @@
 "use client";
 
 import React from 'react';
-import ToggleSwitch from './toggleswitch';
 
 interface ChartHeaderProps {
   title: string;
-  toggleOptions: {
-    type: 'absolute' | 'per100k' | 'weekly' | 'accumulated';
-    label: string;
-    tooltip: string;
-  }[];
-  onToggleChange: (type: 'absolute' | 'per100k' | 'weekly' | 'accumulated') => void; 
+  children?: React.ReactNode;
 }
 
-const ChartHeader: React.FC<ChartHeaderProps> = ({ title, toggleOptions, onToggleChange  }) => {
+const ChartHeader: React.FC<ChartHeaderProps> = ({ title, children  }) => {
   return (
     <div className="chart-header">
       <h3 className="chart-title">{title}</h3>
-      <div className="chart-controls">
-      <ToggleSwitch options={toggleOptions} onToggleChange={onToggleChange} />
-      </div>
+      {children && <div className="chart-controls">{children}</div>}
     </div>
   );
 };

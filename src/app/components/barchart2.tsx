@@ -16,6 +16,7 @@ import ChartHeader from "./chartheader";
 import { Context } from 'chartjs-plugin-datalabels';
 import { useDataStore } from "@/store/dataStore";
 import Skeleton from "react-loading-skeleton"; // Importa o componente Skeleton
+import ToggleSwitch from "./toggleswitch";
 import "react-loading-skeleton/dist/skeleton.css"; // Importa o CSS padrão
 
 Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
@@ -153,22 +154,23 @@ export default function BarChart2() {
   // Renderiza o gráfico quando os dados estão prontos
   return (
     <div className="barchart-component">
-      <ChartHeader
-        title="Cidades"
-        toggleOptions={[
-          {
-            type: 'absolute',
-            label: 'Total de Casos',
-            tooltip: 'Mostrar o número total de casos reportados nas cidades.'
-          },
-          {
-            type: 'per100k',
-            label: 'Por 100 mil habitantes',
-            tooltip: 'Mostrar o número de casos por 100.000 habitantes, ajustado pela população das cidades.'
-          }
-        ]}
-        onToggleChange={(type) => setDataType(type)}
-      />
+      <ChartHeader title="Cidades">
+        <ToggleSwitch
+          options={[
+            {
+              type: 'absolute',
+              label: 'Total de Casos',
+              tooltip: 'Mostrar o número total de casos reportados nas cidades.'
+            },
+            {
+              type: 'per100k',
+              label: 'Por 100 mil habitantes',
+              tooltip: 'Mostrar o número de casos por 100.000 habitantes, ajustado pela população das cidades.'
+            }
+          ]}
+          onToggleChange={(type) => setDataType(type)}
+        />
+      </ChartHeader>
       <div className="barchart-container">
         <div className="barchart-wrapper">
           <Bar

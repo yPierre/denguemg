@@ -101,8 +101,9 @@ body {
   display: flex;
   flex-direction: column;
   margin: 5px;
+  margin-bottom: 20px;
   flex-grow: 1;
-  border-radius: 5px;
+  border-radius: 15px;
   background-color: #ffffff;
   overflow: hidden;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -113,13 +114,13 @@ body {
 .barchart-container {
   flex: 1;
   display: flex;
+  justify-content: center;
   overflow: hidden;
 }
 
 .barchart-wrapper {
   height: 100%;
   width: 95%;
-  padding: 0 15px 15px;
 }
 
 
@@ -138,8 +139,9 @@ body {
   display: flex;
   flex-direction: column;
   margin: 5px;
+  margin-top: 20px;
   background-color: #ffffff;
-  border-radius: 5px;
+  border-radius: 15px;
   box-sizing: border-box;
   flex: 0 0 calc(60% - 10px);
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
@@ -147,7 +149,7 @@ body {
 
 .map-outer{
   flex-grow: 1; /* Ocupa a maior parte do bloco direito */
-  border-radius: 5px;
+  border-radius: 15px;
 }
 
 
@@ -156,14 +158,13 @@ body {
   display: flex;
   flex-direction: column;
   margin: 5px;
-  border-radius: 5px;
+  margin-bottom: 20px;
+  border-radius: 15px;
   background-color: #ffffff;
   box-sizing: border-box;
-  flex: 0 0 calc(40% - 10px);
+  flex: 0 0 calc(40% - 40px);
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
-
-
 
 .linechart-container {
   height: 100%;
@@ -185,6 +186,7 @@ body {
 
 .component-title.first{
   height: 42px;
+  margin: 14px 8px;
 }
 
 .chart-header {
@@ -211,8 +213,9 @@ body {
 /* Estilos para o componente KPI */
 .kpi-container {
   margin: 5px;
+  margin-top: 20px;
   background-color: #ffffff;
-  border-radius: 5px;
+  border-radius: 15px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
@@ -288,7 +291,7 @@ body {
   max-width: 400px;
   background-color: #ffffff;
   margin: 5px;
-  border-radius: 5px;
+  border-radius: 15px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
@@ -296,6 +299,7 @@ body {
   position: relative;
   display: flex;
   width: 100%; /* Mesma largura do campo de texto */
+  
 }
 
 .search-bar {
@@ -303,7 +307,7 @@ body {
   padding: 8px;
   font-size: 16px;
   border: 1px solid #ccc;
-  border-radius: 5px;
+  border-radius: 15px;
   outline: none;
   background: transparent;
   transition: border-color 0.3s ease;
@@ -344,7 +348,7 @@ body {
   border: 1px solid #ccc;
   border-top: none;
   box-sizing: border-box;
-  border-radius: 0 0 5px 5px;
+  border-radius: 15px;
   list-style: none;
   padding: 0px;
   margin: 0px;
@@ -384,7 +388,7 @@ body {
   background: #333;
   color: #a02929;
   padding: 8px 12px;
-  border-radius: 4px;
+  border-radius: 15px;
   font-size: 0.8rem;
   z-index: 9000;
 }
@@ -417,6 +421,30 @@ body {
   font-size: 14px;
 }
 
+.legend-gradient {
+  width: 100%;
+  height: 20px;
+  background: linear-gradient(to right, #FFEBEE, #B71C1C);
+  border-radius: 4px;
+  margin: 8px 0;
+}
+
+.legend-range {
+  display: flex;
+  justify-content: space-between;
+  padding: 5px;
+}
+
+.legend-range span {
+  font-size: 0.8em;
+}
+
+.legend-items {
+  display: flex;
+  flex-direction: column;
+  gap: 5px;
+}
+
 .legend div {
   display: flex;
   align-items: center;
@@ -431,14 +459,7 @@ body {
   border-radius: 2px;
 }
 
-.legend-gradient {
-  width: 100%;
-  margin: 8px 0;
-}
 
-.legend span {
-  font-size: 0.8em;
-}
 
 /*toggle*/
 .toggle-switch-container {
@@ -450,7 +471,7 @@ body {
   align-items: center;
   padding: 0.3rem 0.6rem;
   border: 2px solid #e0e0e0;
-  border-radius: 25px;
+  border-radius: 15px;
   background: #fff;
   cursor: pointer;
   transition: all 0.3s ease;
@@ -483,7 +504,7 @@ body {
 
 
 .toggle-button.toggled .toggle-chevron {
-  transform: rotate(180deg);
+  transform: rotate(360deg);
   color: #9966ff;
 }
 
@@ -491,8 +512,82 @@ body {
   z-index: 1000;
   font-size: 0.8rem !important;
   padding: 0.5rem 1rem !important;
-  border-radius: 4px !important;
+  border-radius: 15px !important;
   background: #333 !important;
+}
+
+.layer-selector-container {
+  position: relative;
+  display: inline-block;
+  margin: 8px 0px;
+}
+
+.layer-selector-button {
+  display: flex;
+  align-items: center;
+  justify-content: space-between; /* Para distribuir o texto e a seta */
+  width: 180px; /* Tamanho fixo ajustável conforme o design */
+  padding: 0.3rem 0.6rem;
+  border: 2px solid #e0e0e0;
+  border-radius: 25px;
+  background: #fff;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.layer-selector-button:hover {
+  border-color: #1A73E8;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.layer-selector-button span:first-child {
+  font-weight: 500; /* Igual ao toggle-label */
+  color: #333;
+  margin-right: 0.5rem; /* Espaço entre o texto e a seta */
+}
+
+.dropdown-arrow {
+  font-size: 0.9em; /* Igual ao toggle-chevron */
+  color: #1A73E8;
+  transition: transform 0.3s ease;
+}
+
+.layer-selector-button.open {
+  border-color: #9966ff;
+}
+
+.layer-selector-button.open .dropdown-arrow {
+  transform: rotate(360deg); /* Igual ao toggle-chevron.toggled */
+  color: #9966ff; /* Igual ao toggle-chevron.toggled */
+}
+
+.layer-selector-list {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  width: 180px;
+  background-color: #fff;
+  border: 1px solid #ccc; /* Igual ao border do botão */
+  border-radius: 15px; /* Um pouco menos arredondado que o botão */
+  border-top: none;
+  box-sizing: border-box;
+  list-style: none;
+  padding: 0px;
+  margin: 0;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+}
+
+.layer-option {
+  padding: 10px;
+  cursor: pointer;
+  color: #333;
+  font-weight: 500; /* Igual ao toggle-label */
+  transition: background-color 0.3s ease;
+}
+
+.layer-option:hover {
+  background-color: #e0e0e0;
 }
 
 
