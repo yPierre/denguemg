@@ -91,21 +91,25 @@ export default function LineChart() {
       "rgba(54, 162, 235, 0.7)",
       "rgba(255, 159, 64, 0.7)",
       "rgba(153, 102, 255, 0.7)",
-      "#1A73E8",
-      "rgba(201, 203, 207, 0.8)",
-      "rgba(75, 192, 192, 0.8)",
+      "rgba(26, 115, 232, 0.7)",
+      "rgba(201, 203, 207, 0.7)",
+      "rgba(75, 192, 192, 0.7)",
     ];
 
     // Criar datasets ordenados do mais antigo para o mais recente
-    const datasets = years.map((year, index) => ({
-      label: `${year}`,
-      data: groupedData[year],
-      fill: false,
-      borderColor: colors[index % colors.length],
-      backgroundColor: colors[index % colors.length],
-      pointRadius: 3,
-      hidden: false,
-    }));
+    const datasets = years.map((year, index) => {
+      const isLatestYear = year === latestYear;
+      return {
+        label: `${year}`,
+        data: groupedData[year],
+        fill: false,
+        borderColor: colors[index % colors.length],
+        backgroundColor: colors[index % colors.length],
+        pointRadius: isLatestYear ? 3 : 1,
+        borderWidth: 3,
+        hidden: false,
+      }
+    });
 
     // Inverter a ordem dos datasets para renderizar o ano mais recente por cima
     const reversedDatasets = [...datasets].reverse();

@@ -282,6 +282,19 @@ body {
   text-align: center;
 }
 
+.chart-footer a {
+  color: #0078A8; /* Cor azul padrão do Leaflet */
+  text-decoration: none; /* Remove o sublinhado */
+}
+
+.chart-footer a:hover {
+  text-decoration: underline; /* Adiciona sublinhado ao passar o mouse, como no Leaflet */
+}
+
+.chart-footer a:visited {
+  color: #0078A8; /* Mantém a cor azul mesmo após ser visitado */
+}
+
 
 /*Search Bar */
 .search-bar-container {
@@ -335,6 +348,7 @@ body {
   top: 0;
   transform: translateY(-50%);
   font-size: 12px;
+  border-radius: 15px;
   color: #1A73E8; /* Azul primário */
 }
 
@@ -404,12 +418,11 @@ body {
   transition: fill-opacity 0.3s ease;
   outline: none !important; /* Remove sombras ao focar */
 }
-
 .legend {
   position: absolute;
   bottom: 30px;
   right: 10px;
-  background: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.9);
   padding: 10px;
   border-radius: 5px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
@@ -421,6 +434,7 @@ body {
   font-size: 14px;
 }
 
+/* Para a legenda de "Casos" */
 .legend-gradient {
   width: 100%;
   height: 20px;
@@ -439,24 +453,99 @@ body {
   font-size: 0.8em;
 }
 
+/* Para as legendas de "Nível" e "Incidência" */
 .legend-items {
   display: flex;
   flex-direction: column;
   gap: 5px;
 }
 
-.legend div {
+.legend-item {
   display: flex;
   align-items: center;
-  margin-bottom: 5px;
 }
 
-.legend span {
-  display: inline-block;
-  width: 12px;
-  height: 12px;
-  margin-right: 5px;
-  border-radius: 2px;
+.legend-color {
+  width: 20px;
+  height: 20px;
+  margin-right: 10px;
+  border-radius: 2px; /* Mantendo o arredondamento leve que você tinha em .legend span */
+}
+
+/* Cores específicas para "Nível" */
+.legend-color.nivel-1 {
+  background-color: #4CAF50;
+}
+
+.legend-color.nivel-2 {
+  background-color: #FFC107;
+}
+
+.legend-color.nivel-3 {
+  background-color: #FF9800;
+}
+
+.legend-color.nivel-4 {
+  background-color: #E53935;
+}
+
+.legend-color.nivel-unknown {
+  background-color: #C8C8C8;
+}
+
+/* Cores específicas para "Incidência" */
+.legend-color.incidencia-0-10 {
+  background-color: #FFFF99;
+}
+
+.legend-color.incidencia-10-50 {
+  background-color: #FFD700;
+}
+
+.legend-color.incidencia-50-100 {
+  background-color: #FFA500;
+}
+
+.legend-color.incidencia-100-200 {
+  background-color: #FF4500;
+}
+
+.legend-color.incidencia-200-300 {
+  background-color: #FF0000;
+}
+
+.legend-color.incidencia-300-plus {
+  background-color: #800020;
+}
+
+/* Cores específicas para "Casos" */
+.legend-color.casos-0-10 {
+  background-color: #FFFF99;
+}
+
+.legend-color.casos-10-50 {
+  background-color: #FFD700;
+}
+
+.legend-color.casos-50-100 {
+  background-color: #FFA500;
+}
+
+.legend-color.casos-100-200 {
+  background-color: #FF4500;
+}
+
+.legend-color.casos-200-300 {
+  background-color: #FF0000;
+}
+
+.legend-color.casos-300-plus {
+  background-color: #800020;
+}
+
+/* Estilização geral dos spans (textos da legenda) */
+.legend-items span {
+  font-size: 0.8em;
 }
 
 

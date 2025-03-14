@@ -46,7 +46,6 @@ const MapChart: React.FC = () => {
   const geoJsonLayerRef = useRef<L.GeoJSON | null>(null);
   const mapRef = useRef<L.Map | null>(null);
   const [mapReady, setMapReady] = useState(false);
-  const [maxCasos, setMaxCasos] = useState(0);
   const [visualization, setVisualization] = useState<'casos' | 'nivel' | 'incidencia'>('casos');
 
   useEffect(() => {
@@ -61,7 +60,7 @@ const MapChart: React.FC = () => {
           const bounds = layer.getBounds();
           const map = mapRef.current;
           if (map) {
-            map.flyToBounds(bounds, { padding: [50, 50], maxZoom: 7, duration: 1 });
+            map.flyToBounds(bounds, { padding: [50, 50], maxZoom: 8, duration: 1 });
           }
         }
       }
@@ -78,13 +77,6 @@ const MapChart: React.FC = () => {
       .catch((error) => console.error("Erro ao carregar o GeoJSON:", error));
   }, []);
 
-  useEffect(() => {
-    if (stateData && stateData[0]?.cities) {
-      const casos = stateData[0].cities.map((c: CityData) => c.casos);
-      const currentMax = Math.max(...casos);
-      setMaxCasos(currentMax);
-    }
-  }, [stateData]);
 
   useEffect(() => {
     return () => {
@@ -113,12 +105,12 @@ const MapChart: React.FC = () => {
   }
 
   const getColorByCasos = (casos: number) => {
-    if (maxCasos === 0) return '#FFEBEE';
-    const ratio = casos / maxCasos;
-    const red = Math.floor(255 - (255 - 183) * ratio);
-    const green = Math.floor(235 - (235 - 28) * ratio);
-    const blue = Math.floor(238 - (238 - 28) * ratio);
-    return `rgb(${red}, ${green}, ${blue})`;
+    if (casos >= 300) return "#800020"; // 300+
+    if (casos >= 200) return "#FF0000"; // 200-300
+    if (casos >= 100) return "#FF4500"; // 100-200
+    if (casos >= 50) return "#FFA500"; // 50-100
+    if (casos >= 10) return "#FFD700"; // 10-50
+    return "#FFFF99"; // 0-10
   };
 
   const getColorByNivel = (nivel: number) => {
@@ -163,18 +155,18 @@ const MapChart: React.FC = () => {
     }
     const city = citiesMap.get(Number(feature.properties.id));
     const isSelected = selectedCity === city?.city;
-    const fillOpacity = selectedCity ? (isSelected ? 1 : 0.5) : 0.7;
+    const fillOpacity = selectedCity ? (isSelected ? 1 : 0.2) : 0.7;
     let fillColor;
     if (visualization === 'casos') {
       fillColor = getColorByCasos(city?.casos || 0);
     } else if (visualization === 'nivel') {
       fillColor = getColorByNivel(city?.nivel || 0);
     } else {
-      fillColor = getColorByIncidencia(city?.p_inc100k || 0); // Assume que p_inc100k está nos dados
+      fillColor = getColorByIncidencia(city?.p_inc100k || 0);
     }
     return {
       fillColor,
-      weight: isSelected ? 1 : 0.5,
+      weight: isSelected ? 1.5 : 0.5,
       opacity: 1,
       color: "#000",
       fillOpacity,
@@ -273,7 +265,7 @@ const MapChart: React.FC = () => {
           >
             <TileLayer
               url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
-              attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+              attribution='© <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors | Fonte: <a href="https://info.dengue.mat.br">info.dengue.mat.br</a>'
             />
             {stateData && (
               <GeoJSON
@@ -290,10 +282,31 @@ const MapChart: React.FC = () => {
       {visualization === 'casos' ? (
         <div className="legend">
           <h4>Intensidade de Casos</h4>
-          <div className="legend-gradient" />
-          <div className="legend-range">
-            <span>0</span>
-            <span>{maxCasos}</span>
+          <div className="legend-items">
+            <div className="legend-item">
+              <div className="legend-color casos-300-plus" />
+              <span>300+</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color casos-200-300" />
+              <span>200-300</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color casos-100-200" />
+              <span>100-200</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color casos-50-100" />
+              <span>50-100</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color casos-10-50" />
+              <span>10-50</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color casos-0-10" />
+              <span>0-10</span>
+            </div>
           </div>
         </div>
       ) : visualization === 'nivel' ? (
@@ -301,20 +314,20 @@ const MapChart: React.FC = () => {
           <h4>Nível de Alerta</h4>
           <div className="legend-items">
             <div className="legend-item">
-              <div className="legend-color nivel-1" />
-              <span>Nível 1</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color nivel-2" />
-              <span>Nível 2</span>
+              <div className="legend-color nivel-4" />
+              <span>Alta Incidência</span>
             </div>
             <div className="legend-item">
               <div className="legend-color nivel-3" />
-              <span>Nível 3</span>
+              <span>Transmissão ativa</span>
             </div>
             <div className="legend-item">
-              <div className="legend-color nivel-4" />
-              <span>Nível 4</span>
+              <div className="legend-color nivel-2" />
+              <span>Atenção</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color nivel-1" />
+              <span>Baixa Transmissão</span>
             </div>
             <div className="legend-item">
               <div className="legend-color nivel-unknown" />
@@ -324,31 +337,31 @@ const MapChart: React.FC = () => {
         </div>
       ) : (
         <div className="legend">
-          <h4>Incidência por 100 mil</h4>
+          <h4>Incidência por 100 mil habitantes</h4>
           <div className="legend-items">
             <div className="legend-item">
-              <div className="legend-color incidencia-0-10" />
-              <span>0-10</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color incidencia-10-50" />
-              <span>10-50</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color incidencia-50-100" />
-              <span>50-100</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color incidencia-100-200" />
-              <span>100-200</span>
+              <div className="legend-color incidencia-300-plus" />
+              <span>300+</span>
             </div>
             <div className="legend-item">
               <div className="legend-color incidencia-200-300" />
               <span>200-300</span>
             </div>
             <div className="legend-item">
-              <div className="legend-color incidencia-300-plus" />
-              <span>300+</span>
+              <div className="legend-color incidencia-100-200" />
+              <span>100-200</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color incidencia-50-100" />
+              <span>50-100</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color incidencia-10-50" />
+              <span>10-50</span>
+            </div>
+            <div className="legend-item">
+              <div className="legend-color incidencia-0-10" />
+              <span>0-10</span>
             </div>
           </div>
         </div>

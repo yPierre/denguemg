@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useRef } from "react";
 import { Bar } from "react-chartjs-2";
 import {
   Chart,
@@ -15,9 +15,9 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 import ChartHeader from "./chartheader";
 import { Context } from 'chartjs-plugin-datalabels';
 import { useDataStore } from "@/store/dataStore";
-import Skeleton from "react-loading-skeleton"; // Importa o componente Skeleton
+import Skeleton from "react-loading-skeleton";
 import ToggleSwitch from "./toggleswitch";
-import "react-loading-skeleton/dist/skeleton.css"; // Importa o CSS padrão
+import "react-loading-skeleton/dist/skeleton.css";
 
 Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
 
@@ -30,9 +30,10 @@ interface CityData {
 }
 
 export default function BarChart2() {
-  const { stateData } = useDataStore(); // Pega os dados do estado global
-  const [dataType, setDataType] = useState<'absolute' | 'per100k' | 'weekly' | 'accumulated'>('weekly');
+  const { stateData } = useDataStore();
+  const [dataType, setDataType] = useState<'absolute' | 'per100k'>('absolute');
   const currentStateData = stateData?.[0] || null;
+  const chartWrapperRef = useRef<HTMLDivElement>(null); // Referência para medir a altura
 
   const [chartData, setChartData] = useState<{
     labels: string[];
@@ -42,24 +43,48 @@ export default function BarChart2() {
     datasets: [],
   });
 
-  useEffect(() => {
-    // Verifica se os dados atuais e as cidades estão disponíveis
-    if (!currentStateData || !Array.isArray(currentStateData.cities)) return;
+  const getColorByCasos = (casos: number) => {
+    if (casos >= 2000) return "#800020";
+    if (casos >= 1000) return "#FF0000";
+    if (casos >= 500) return "#FF4500";
+    if (casos >= 100) return "#FFA500";
+    if (casos >= 50) return "#FFD700";
+    return "#FFFF99";
+  };
 
-    // Determina qual campo usar baseado no dataType
+  const getColorByIncidencia = (incidencia: number) => {
+    if (incidencia >= 300) return "#800020";
+    if (incidencia >= 200) return "#FF0000";
+    if (incidencia >= 100) return "#FF4500";
+    if (incidencia >= 50) return "#FFA500";
+    if (incidencia >= 10) return "#FFD700";
+    if (incidencia >= 0) return "#FFFF99";
+    return "#C8C8C8";
+  };
+
+  useEffect(() => {
+    if (!currentStateData || !Array.isArray(currentStateData.cities) || !chartWrapperRef.current) return;
+
     const dataField: keyof CityData = dataType === 'per100k' ? 'p_inc100k' : 'casos';
     const labelText = dataType === 'per100k' ? 'Casos por 100k habitantes' : 'Casos na Última Semana';
 
-    // Ordena cidades por número de casos e pega as 15 com mais casos
+    // Ordena cidades por número de casos
     const sortedCities = currentStateData.cities
-      .sort((a: CityData, b: CityData) => b[dataField] - a[dataField])
-      .slice(0, 10);
+      .sort((a: CityData, b: CityData) => b[dataField] - a[dataField]);
 
-    const labels = sortedCities.map((city: CityData) => city.city);
-    const dataValues = sortedCities.map((city: CityData) => 
+    // Calcula quantas barras cabem no espaço disponível
+    const barThickness = 25; // Largura fixa das barras em pixels
+    const chartHeight = chartWrapperRef.current.clientHeight || 300; // Altura padrão se não disponível
+    const maxBars = Math.floor(chartHeight / (barThickness + 5)); // 5px de espaço entre barras
+    const visibleCities = sortedCities.slice(0, Math.min(maxBars, sortedCities.length));
+
+    const labels = visibleCities.map((city: CityData) => city.city);
+    const dataValues = visibleCities.map((city: CityData) => 
       dataType === 'per100k' ? Number(city[dataField].toFixed(2)) : city[dataField]
     );
-    const backgroundColors = sortedCities.map((city: CityData) => getAlertColor(city.nivel));
+    const backgroundColors = visibleCities.map((city: CityData) => 
+      dataType === 'per100k' ? getColorByIncidencia(city.p_inc100k) : getColorByCasos(city.casos)
+    );
 
     setChartData({
       labels: labels,
@@ -68,39 +93,22 @@ export default function BarChart2() {
           label: labelText,
           data: dataValues,
           backgroundColor: backgroundColors,
-          borderColor: backgroundColors.map((color: string) => color.replace("0.6", "1")),
+          borderColor: backgroundColors,
           borderWidth: 1,
         },
       ],
     });
-  }, [currentStateData, dataType]); // Atualiza o gráfico sempre que `currentStateData` mudar
+  }, [currentStateData, dataType]);
 
-  // Função para definir cores com base no nível de alerta
-  const getAlertColor = (nivel: number) => {
-    switch (nivel) {
-      case 1:
-        return "#4CAF50"; // Verde (baixo risco)
-      case 2:
-        return "#FFC107"; // Amarelo (médio risco)
-      case 3:
-        return "#FF9800"; // Laranja (alto risco)
-      case 4:
-        return "#E53935"; // Vermelho (alerta máximo)
-      default:
-        return "rgba(200, 200, 200, 0.6)"; // Cinza (desconhecido)
-    }
-  };
-
-  // Renderiza o skeleton enquanto os dados não estão disponíveis
   if (!stateData) {
     return (
       <div className="barchart-component">
         <h3 className="component-title">
-          <Skeleton/>
+          <Skeleton />
         </h3>
         <div className="barchart-container">
           <div className="barchart-wrapper">
-            <Skeleton/>
+            <Skeleton />
           </div>
         </div>
       </div>
@@ -110,7 +118,7 @@ export default function BarChart2() {
   const options = {
     responsive: true,
     maintainAspectRatio: false,
-    indexAxis: "y" as const, // Corrigido aqui
+    indexAxis: "y" as const,
     scales: {
       x: {
         title: { 
@@ -149,9 +157,9 @@ export default function BarChart2() {
         offset: 10,
       },
     },
-  } as const; // Adicionamos 'as const' para garantir a tipagem literal
+    barThickness: 20, // Largura fixa das barras
+  } as const;
 
-  // Renderiza o gráfico quando os dados estão prontos
   return (
     <div className="barchart-component">
       <ChartHeader title="Cidades">
@@ -168,11 +176,15 @@ export default function BarChart2() {
               tooltip: 'Mostrar o número de casos por 100.000 habitantes, ajustado pela população das cidades.'
             }
           ]}
-          onToggleChange={(type) => setDataType(type)}
+          onToggleChange={(type: 'absolute' | 'per100k' | 'weekly' | 'accumulated') => {
+            if (type === 'absolute' || type === 'per100k') {
+              setDataType(type);
+            }
+          }}
         />
       </ChartHeader>
       <div className="barchart-container">
-        <div className="barchart-wrapper">
+        <div className="barchart-wrapper" ref={chartWrapperRef}>
           <Bar
             data={chartData}
             plugins={[ChartDataLabels]}
