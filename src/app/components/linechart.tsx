@@ -86,14 +86,14 @@ export default function LineChart() {
 
     // Cores
     const colors = [
-      "rgba(75, 192, 192, 0.7)",
-      "rgba(255, 99, 132, 0.7)",
-      "rgba(54, 162, 235, 0.7)",
-      "rgba(255, 159, 64, 0.7)",
-      "rgba(153, 102, 255, 0.7)",
-      "rgba(26, 115, 232, 0.7)",
-      "rgba(201, 203, 207, 0.7)",
-      "rgba(75, 192, 192, 0.7)",
+      "#EE3377B3",
+      "#CC3311B3",
+      "#EE7733B3",
+      "#009988B3",
+      "#33BBEEB3",
+      "#0077BBB3",
+      "#BBBBBBB3",
+      "#44AA99B3",
     ];
 
     // Criar datasets ordenados do mais antigo para o mais recente

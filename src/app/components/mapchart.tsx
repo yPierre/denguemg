@@ -47,6 +47,7 @@ const MapChart: React.FC = () => {
   const mapRef = useRef<L.Map | null>(null);
   const [mapReady, setMapReady] = useState(false);
   const [visualization, setVisualization] = useState<'casos' | 'nivel' | 'incidencia'>('casos');
+  const [isColorblindMode, setIsColorblindMode] = useState(false);
 
   useEffect(() => {
     if (selectedCity && geoJsonLayerRef.current && stateData) {
@@ -105,37 +106,43 @@ const MapChart: React.FC = () => {
   }
 
   const getColorByCasos = (casos: number) => {
-    if (casos >= 300) return "#800020"; // 300+
-    if (casos >= 200) return "#FF0000"; // 200-300
-    if (casos >= 100) return "#FF4500"; // 100-200
-    if (casos >= 50) return "#FFA500"; // 50-100
-    if (casos >= 10) return "#FFD700"; // 10-50
-    return "#FFFF99"; // 0-10
+    if (casos >= 300) return "#bd0026"; // 300+
+    if (casos >= 200) return "#f03b20"; // 200-300
+    if (casos >= 100) return "#fd8d3c"; // 100-200
+    if (casos >= 50) return "#feb24c"; // 50-100
+    if (casos >= 10) return "#fed976"; // 10-50
+    if (casos >= 0) return "#ffffb2"; // 0-10
+    return "#C8C8C8"; // 0-10
   };
 
   const getColorByNivel = (nivel: number) => {
     switch (nivel) {
-      case 1:
-        return "#4CAF50";
-      case 2:
-        return "#FFC107";
-      case 3:
-        return "#FF9800";
-      case 4:
-        return "#E53935";
-      default:
-        return "#C8C8C8";
+      case 1: return "#4daf4a";
+      case 2: return "#ffff33";
+      case 3: return "#ff7f00";
+      case 4: return "#e41a1c";
+      default: return "#C8C8C8";
+    }
+  };
+
+  const getColorByNivelColorblind = (nivel: number) => {
+    switch (nivel) {
+      case 1: return "#0077bb"; // Azul escuro
+      case 2: return "#33bbee"; // Azul médio
+      case 3: return "#ee7733"; // Laranja claro
+      case 4: return "#cc3311"; // Vermelho escuro
+      default: return "#bbbbbb"; // Desconhecido
     }
   };
 
   const getColorByIncidencia = (incidencia: number) => {
-    if (incidencia >= 300) return "#800020"; // Vinho
-    if (incidencia >= 200) return "#FF0000"; // Vermelho
-    if (incidencia >= 100) return "#FF4500"; // Laranja escuro
-    if (incidencia >= 50) return "#FFA500"; // Laranja claro
-    if (incidencia >= 10) return "#FFD700"; // Amarelo escuro
-    if (incidencia >= 0) return "#FFFF99"; // Amarelo claro
-    return "#C8C8C8"; // Cinza (default, para valores inválidos)
+    if (incidencia >= 300) return "#bd0026"; // Vinho
+    if (incidencia >= 200) return "#f03b20"; // Vermelho
+    if (incidencia >= 100) return "#fd8d3c"; // Laranja escuro
+    if (incidencia >= 50) return "#feb24c"; // Laranja claro
+    if (incidencia >= 10) return "#fed976"; // Amarelo escuro
+    if (incidencia >= 0) return "#ffffb2"; // Amarelo claro
+    return "#C8C8C8";
   };
 
   const citiesMap = new Map<number, CityData>();
@@ -160,7 +167,9 @@ const MapChart: React.FC = () => {
     if (visualization === 'casos') {
       fillColor = getColorByCasos(city?.casos || 0);
     } else if (visualization === 'nivel') {
-      fillColor = getColorByNivel(city?.nivel || 0);
+      fillColor = isColorblindMode
+        ? getColorByNivelColorblind(city?.nivel || 0)
+        : getColorByNivel(city?.nivel || 0);
     } else {
       fillColor = getColorByIncidencia(city?.p_inc100k || 0);
     }
@@ -175,15 +184,17 @@ const MapChart: React.FC = () => {
 
   const onEachFeature = (feature: Feature<Geometry, GeoFeatureProperties>, layer: L.Layer) => {
     const city = citiesMap.get(Number(feature.properties.id));
+    const levels: Record<number, string> = {
+      1: "Baixa Transmissão",
+      2: "Atenção",
+      3: "Transmissão Ativa",
+      4: "Alta Incidência"
+    };
     if (city) {
       let tooltipContent;
-      if (visualization === 'casos') {
         tooltipContent = `<strong>${feature.properties.name}</strong><br>Casos de dengue na última semana: ${city.casos}`;
-      } else if (visualization === 'nivel') {
-        tooltipContent = `<strong>${feature.properties.name}</strong><br>Nível de Alerta: ${city.nivel}`;
-      } else {
-        tooltipContent = `<strong>${feature.properties.name}</strong><br>Incidência por 100 mil habitantes: ${city.p_inc100k.toFixed(2)}`;
-      }
+        tooltipContent += `<br>Nível de Alerta: ${levels[city.nivel] || "Desconhecido"}`;
+        tooltipContent += `<br>Incidência por 100 mil habitantes: ${city.p_inc100k.toFixed(2)}`;
       layer.bindTooltip(tooltipContent, { permanent: false, sticky: true });
       layer.on("click", () => {
         setSelectedCity(city.city);
@@ -224,6 +235,19 @@ const MapChart: React.FC = () => {
   return (
     <div className="map-container">
       <ChartHeader title="Mapa de Alertas de Dengue na Última Semana">
+        <button
+          className={`colorblind-toggle ${isColorblindMode ? "active" : ""}`}
+          onClick={() => setIsColorblindMode(!isColorblindMode)}
+          data-tooltip-id="colorblind-tooltip"
+          data-tooltip-content={isColorblindMode ? "Desativa o Modo Daltônico" : "Ativar Modo Daltônico"}
+        >
+          {isColorblindMode ? "Destivar Modo Daltônico" : "Ativar Modo Daltônico"}
+        </button>
+        <ReactTooltip
+          id="colorblind-tooltip"
+          className="tooltip-custom"
+          place="bottom"
+        />
         <LayerSelector
           options={layerOptions}
           onLayerChange={handleLayerChange}
@@ -314,23 +338,23 @@ const MapChart: React.FC = () => {
           <h4>Nível de Alerta</h4>
           <div className="legend-items">
             <div className="legend-item">
-              <div className="legend-color nivel-4" />
+              <div className="legend-color" style={{ backgroundColor: isColorblindMode ? getColorByNivelColorblind(4) : getColorByNivel(4) }} />
               <span>Alta Incidência</span>
             </div>
             <div className="legend-item">
-              <div className="legend-color nivel-3" />
+              <div className="legend-color" style={{ backgroundColor: isColorblindMode ? getColorByNivelColorblind(3) : getColorByNivel(3) }} />
               <span>Transmissão ativa</span>
             </div>
             <div className="legend-item">
-              <div className="legend-color nivel-2" />
+              <div className="legend-color" style={{ backgroundColor: isColorblindMode ? getColorByNivelColorblind(2) : getColorByNivel(2) }} />
               <span>Atenção</span>
             </div>
             <div className="legend-item">
-              <div className="legend-color nivel-1" />
+              <div className="legend-color" style={{ backgroundColor: isColorblindMode ? getColorByNivelColorblind(1) : getColorByNivel(1) }} />
               <span>Baixa Transmissão</span>
             </div>
             <div className="legend-item">
-              <div className="legend-color nivel-unknown" />
+              <div className="legend-color" style={{ backgroundColor: isColorblindMode ? getColorByNivelColorblind(0) : getColorByNivel(0) }} />
               <span>Desconhecido</span>
             </div>
           </div>

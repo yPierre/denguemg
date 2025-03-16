@@ -15,6 +15,45 @@ body {
   margin: 0;
 }
 
+/* styles/globals.css */
+
+.home-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+  background-color: #fff;
+}
+
+.home-title {
+  font-size: 2rem;
+  color: #333;
+  margin-bottom: 1rem;
+}
+
+.home-subtitle {
+  font-size: 1.2rem;
+  color: #666;
+  margin-bottom: 2rem;
+}
+
+.home-button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  color: #fff;
+  background-color: #1a73e8;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.home-button:hover {
+  background-color: #1557b0; /* Uma versão mais escura do #1A73E8 */
+}
+
+
 .main-container{
   width: 100vw;
   height: 100vh;
@@ -495,57 +534,79 @@ body {
 
 /* Cores específicas para "Incidência" */
 .legend-color.incidencia-0-10 {
-  background-color: #FFFF99;
+  background-color: #ffffb2;
 }
 
 .legend-color.incidencia-10-50 {
-  background-color: #FFD700;
+  background-color: #fed976;
 }
 
 .legend-color.incidencia-50-100 {
-  background-color: #FFA500;
+  background-color: #feb24c;
 }
 
 .legend-color.incidencia-100-200 {
-  background-color: #FF4500;
+  background-color: #fd8d3c;
 }
 
 .legend-color.incidencia-200-300 {
-  background-color: #FF0000;
+  background-color: #f03b20;
 }
 
 .legend-color.incidencia-300-plus {
-  background-color: #800020;
+  background-color: #bd0026;
 }
 
 /* Cores específicas para "Casos" */
 .legend-color.casos-0-10 {
-  background-color: #FFFF99;
+  background-color: #ffffb2;
 }
 
 .legend-color.casos-10-50 {
-  background-color: #FFD700;
+  background-color: #fed976;
 }
 
 .legend-color.casos-50-100 {
-  background-color: #FFA500;
+  background-color: #feb24c;
 }
 
 .legend-color.casos-100-200 {
-  background-color: #FF4500;
+  background-color: #fd8d3c;
 }
 
 .legend-color.casos-200-300 {
-  background-color: #FF0000;
+  background-color: #f03b20;
 }
 
 .legend-color.casos-300-plus {
-  background-color: #800020;
+  background-color: #bd0026;
 }
 
 /* Estilização geral dos spans (textos da legenda) */
 .legend-items span {
   font-size: 0.8em;
+}
+
+.colorblind-toggle {
+  padding: 8px 16px;
+  margin-left: 10px;
+  align-items: center;
+  padding: 0.3rem 0.6rem;
+  background-color: #ffffff;
+  border: 2px solid #e0e0e0;
+  border-radius: 15px;
+  color: #333;
+  cursor: pointer;
+}
+
+.colorblind-toggle:hover {
+  border-color: #1A73E8;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+}
+
+.colorblind-toggle.active {
+  border-color: #1A73E8;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 
 

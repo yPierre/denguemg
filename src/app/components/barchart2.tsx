@@ -44,21 +44,22 @@ export default function BarChart2() {
   });
 
   const getColorByCasos = (casos: number) => {
-    if (casos >= 2000) return "#800020";
-    if (casos >= 1000) return "#FF0000";
-    if (casos >= 500) return "#FF4500";
-    if (casos >= 100) return "#FFA500";
-    if (casos >= 50) return "#FFD700";
-    return "#FFFF99";
+    if (casos >= 2000) return "#bd0026";
+    if (casos >= 1000) return "#f03b20";
+    if (casos >= 500) return "#fd8d3c";
+    if (casos >= 100) return "#feb24c";
+    if (casos >= 50) return "#fed976";
+    if (casos >= 10) return "#ffffb2";
+    return "#C8C8C8";
   };
 
   const getColorByIncidencia = (incidencia: number) => {
-    if (incidencia >= 300) return "#800020";
-    if (incidencia >= 200) return "#FF0000";
-    if (incidencia >= 100) return "#FF4500";
-    if (incidencia >= 50) return "#FFA500";
-    if (incidencia >= 10) return "#FFD700";
-    if (incidencia >= 0) return "#FFFF99";
+    if (incidencia >= 300) return "#bd0026";
+    if (incidencia >= 200) return "#f03b20";
+    if (incidencia >= 100) return "#fd8d3c";
+    if (incidencia >= 50) return "#feb24c";
+    if (incidencia >= 10) return "#fed976";
+    if (incidencia >= 0) return "#ffffb2";
     return "#C8C8C8";
   };
 
