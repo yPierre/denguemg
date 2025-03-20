@@ -235,14 +235,16 @@ const MapChart: React.FC = () => {
   return (
     <div className="map-container">
       <ChartHeader title="Mapa de Alertas de Dengue na Última Semana">
-        <button
-          className={`colorblind-toggle ${isColorblindMode ? "active" : ""}`}
-          onClick={() => setIsColorblindMode(!isColorblindMode)}
-          data-tooltip-id="colorblind-tooltip"
-          data-tooltip-content={isColorblindMode ? "Desativa o Modo Daltônico" : "Ativar Modo Daltônico"}
-        >
-          {isColorblindMode ? "Destivar Modo Daltônico" : "Ativar Modo Daltônico"}
-        </button>
+        {visualization === 'nivel' && (
+          <button
+            className={`colorblind-toggle ${isColorblindMode ? "active" : ""}`}
+            onClick={() => setIsColorblindMode(!isColorblindMode)}
+            data-tooltip-id="colorblind-tooltip"
+            data-tooltip-content={isColorblindMode ? "Desativa o Modo Daltônico" : "Ativar Modo Daltônico"}
+          >
+            {isColorblindMode ? "Destivar Modo Daltônico" : "Ativar Modo Daltônico"}
+          </button>
+        )}
         <ReactTooltip
           id="colorblind-tooltip"
           className="tooltip-custom"
@@ -279,7 +281,7 @@ const MapChart: React.FC = () => {
             place="bottom"
           />
         </button>
-        {!mapReady && <div>Carregando mapa...</div>}
+        {!mapReady}
         {mapReady && (
           <MapContainer
             center={[-18.5122, -44.555]}
@@ -293,7 +295,7 @@ const MapChart: React.FC = () => {
             />
             {stateData && (
               <GeoJSON
-                key={`${visualization}-${selectedCity || 'none'}`} // Força re-renderização
+                key={`${visualization}-${selectedCity || 'none'}`}
                 ref={geoJsonLayerRef}
                 data={geoData as GeoJSON.FeatureCollection}
                 style={styleFeature}

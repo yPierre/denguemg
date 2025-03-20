@@ -86,14 +86,14 @@ export default function LineChart() {
 
     // Cores
     const colors = [
-      "#EE3377B3",
-      "#CC3311B3",
-      "#EE7733B3",
-      "#009988B3",
-      "#33BBEEB3",
-      "#0077BBB3",
-      "#BBBBBBB3",
-      "#44AA99B3",
+      "#EE337780",
+      "#CC331180",
+      "#EE773380",
+      "#00998880",
+      "#33BBEE",
+      "#0077BB80",
+      "#BBBBBB80",
+      "#44AA9980",
     ];
 
     // Criar datasets ordenados do mais antigo para o mais recente
@@ -105,7 +105,7 @@ export default function LineChart() {
         fill: false,
         borderColor: colors[index % colors.length],
         backgroundColor: colors[index % colors.length],
-        pointRadius: isLatestYear ? 3 : 1,
+        pointRadius: isLatestYear ? 2 : 0,
         borderWidth: 3,
         hidden: false,
       }
