@@ -90,7 +90,7 @@ export default function LineChart() {
       "#CC331180",
       "#EE773380",
       "#00998880",
-      "#33BBEE",
+      "#33BBEE80",
       "#0077BB80",
       "#BBBBBB80",
       "#44AA9980",
@@ -103,9 +103,11 @@ export default function LineChart() {
         label: `${year}`,
         data: groupedData[year],
         fill: false,
-        borderColor: colors[index % colors.length],
+        borderColor: isLatestYear 
+        ? colors[index % colors.length].slice(0, -2) 
+        : colors[index % colors.length],
         backgroundColor: colors[index % colors.length],
-        pointRadius: isLatestYear ? 2 : 0,
+        pointRadius: isLatestYear ? 2 : 0.2,
         borderWidth: 3,
         hidden: false,
       }
@@ -128,7 +130,7 @@ export default function LineChart() {
           <Skeleton width={200} height={24} />
         </h3>
         <div className="linechart-container">
-          <Skeleton height={300} />
+          <Skeleton height={200} />
         </div>
       </div>
     );
@@ -178,7 +180,6 @@ export default function LineChart() {
               plugins: {
                 legend: {
                   reverse: true,
-                  // Remove a propriedade reverse para manter a ordem correta na legenda
                   onClick: (e, legendItem, legend) => {
                     const index = legendItem.datasetIndex;
                     if (index === undefined) return;

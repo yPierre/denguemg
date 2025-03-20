@@ -219,26 +219,24 @@ body {
   font-size: 18px;
   font-weight: bold;
   color: #333; /* Cinza escuro para melhor contraste */
-  margin: 8px;
   text-align: left;
 }
 
 .component-title.first{
   height: 42px;
-  margin: 14px 8px;
+  margin: 10px 8px;
 }
 
 .chart-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
-  margin: 0px 8px;
 }
 
 .chart-title{
-  margin: 0;
   font-size: 18px;
   color: #333;
+  margin: 10px 8px;
 }
 
 
@@ -613,7 +611,7 @@ body {
 
 /*toggle*/
 .toggle-switch-container {
-  margin: 8px 0px;
+  margin: 6px 8px;
 }
 
 .toggle-button {
@@ -670,7 +668,7 @@ body {
 .layer-selector-container {
   position: relative;
   display: inline-block;
-  margin: 8px 0px;
+  margin: 6px 0px;
 }
 
 .layer-selector-button {
@@ -824,7 +822,8 @@ body {
 
   .barchart-container,
   .map-outer {
-    min-height: 300px;
+    min-height: 250px;
+    height: 45vh;
 
   }
 
@@ -923,13 +922,13 @@ body {
   }
   
   .header-title {
-    white-space: normal; /* Permite quebra de linha */
+    white-space: normal;
     max-width: 45%;
     text-align: center;
   }
   
   .logo-component {
-    order: 1; /* Logo fica acima em mobile */
+    order: 1;
   }
 
   .site-name{
