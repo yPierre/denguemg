@@ -1,36 +1,24 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Observatório de Dengue para Minas Gerais
 
-## Getting Started
+Bem-vindo ao repositório do *dashboard* interativo desenvolvido para monitoramento de dados de dengue em Minas Gerais! Este projeto é parte do meu Trabalho de Conclusão de Curso (TCC), orientado pelo Prof. Vander Luis de Souza Freitas, e tem como objetivo oferecer uma ferramenta ágil e visual para gestores de saúde e o público geral acompanharem a situação da dengue no estado.
 
-First, run the development server:
+## O que ele faz?
+O *dashboard* exibe dados da API pública do InfoDengue, com visualizações como:
+- Mapas temáticos para padrões geográficos;
+- Indicadores-chave de desempenho (KPIs) para números gerais;
+- Gráficos de barras e linhas para comparações e tendências temporais.
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+Tudo isso com interatividade cruzada, responsividade e um desempenho otimizado (carrega em ~1,2s, bem mais rápido que os 4,8s do InfoDengue!).
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## Tecnologias usadas
+- *Front-end*: Next.js, Chart.js, Leaflet
+- Banco de dados: MongoDB Atlas
+- Hospedagem: Vercel
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## Como rodar localmente?
+1. Clone este repositório: `git clone [URL do repositório]`
+2. Instale as dependências: `npm install`
+3. Configure as variáveis de ambiente (veja `.env.example`)
+4. Inicie o projeto: `npm run dev`
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Dúvidas? Só dar um grito! Este projeto foi feito com muito esforço e um café a mais do que o recomendado. 😄
