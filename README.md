@@ -8,7 +8,7 @@ O *dashboard* exibe dados da API pública do InfoDengue, com visualizações com
 - Indicadores-chave de desempenho (KPIs) para números gerais;
 - Gráficos de barras e linhas para comparações e tendências temporais.
 
-Tudo isso com interatividade cruzada, responsividade e um desempenho otimizado (carrega em ~1,2s, bem mais rápido que os 4,8s do InfoDengue!).
+Tudo isso com interatividade cruzada, responsividade e um desempenho otimizado.
 
 ## Tecnologias usadas
 - *Front-end*: Next.js, Chart.js, Leaflet
