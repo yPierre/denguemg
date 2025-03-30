@@ -6,7 +6,6 @@ import Skeleton from "react-loading-skeleton";
 import "react-loading-skeleton/dist/skeleton.css";
 import ChartFooter from "./chartfooter";
 
-// Função para formatar números com separadores de milhar
 const formatNumber = (number: number | null | undefined) => {
   if (number === null || number === undefined) {
     return "N/A";
@@ -14,9 +13,9 @@ const formatNumber = (number: number | null | undefined) => {
   return number.toLocaleString("pt-BR");
 };
 
-// Função para calcular a data a partir de SE
+// Calcular a data a partir de SE
 const getDateFromSE = (se: number) => {
-  const seStr = se.toString().padStart(6, "0"); // Garante formato "YYYYWW"
+  const seStr = se.toString().padStart(6, "0");
   const year = parseInt(seStr.substring(0, 4));
   const week = parseInt(seStr.substring(4, 6));
   const firstDayOfYear = new Date(year, 0, 1);
@@ -38,7 +37,6 @@ const KPI: React.FC = () => {
   let se: number = 0;
 
   if (cityData && cityData[0]) {
-    // Ordena por SE decrescente para ter a semana mais recente primeiro
     const sortedCityHistory = [...cityData[0].data].sort((a, b) => b.SE - a.SE);
     const latestCityData = sortedCityHistory[0];
     se = latestCityData.SE;
@@ -56,7 +54,6 @@ const KPI: React.FC = () => {
     const latestStateData = stateData[0];
     se = latestStateData.SE;
 
-    // Remove duplicatas de stateData antes de calcular
     const uniqueStateData = stateData.filter(
       (item, index, self) => self.findIndex((i) => i.SE === item.SE) === index
     );
@@ -72,7 +69,7 @@ const KPI: React.FC = () => {
     };
   }
 
-  // Renderiza o skeleton se currentData for null
+  // Skeleton
   if (currentData === null) {
     return (
       <div className="kpi-container">

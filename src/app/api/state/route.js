@@ -24,7 +24,6 @@ export async function GET(request) {
     }
 }
 
-// Função para buscar dados do estado (mantida igual)
 async function getStateData(db) {
     const latestWeek = await db.collection("statev4")
         .find({}, {
@@ -64,12 +63,11 @@ async function getStateData(db) {
     return NextResponse.json(stateData);
 }
 
-// Função corrigida para buscar dados da cidade
 async function getCityData(db, cityName) {
     const cityHistory = await db.collection("statev4")
         .aggregate([
             { $unwind: "$cities" },
-            { $match: { "cities.city": new RegExp(cityName, "i") } },
+            { $match: { "cities.city": cityName } },
             { 
                 $group: {
                     _id: "$SE",
@@ -89,7 +87,6 @@ async function getCityData(db, cityName) {
         );
     }
 
-    // Formatação correta dos dados
     const formattedData = cityHistory.map(week => ({
         SE: week.SE,
         cities: [week.cityData]
