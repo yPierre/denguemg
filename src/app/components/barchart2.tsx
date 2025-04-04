@@ -163,17 +163,17 @@ export default function BarChart2() {
 
   return (
     <div className="barchart-component">
-      <ChartHeader title="Cidades">
+      <ChartHeader title="Cidades (Última Semana)">
         <ToggleSwitch
           options={[
             {
               type: 'absolute',
-              label: 'Total de Casos',
+              label: 'Casos Totais',
               tooltip: 'Mostrar o número total de casos reportados nas cidades.'
             },
             {
               type: 'per100k',
-              label: 'Por 100 mil habitantes',
+              label: 'Inc./100 mil',
               tooltip: 'Mostrar o número de casos por 100.000 habitantes, ajustado pela população das cidades.'
             }
           ]}
