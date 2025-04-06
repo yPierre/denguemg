@@ -117,7 +117,7 @@ export default function LineChart() {
     const reversedDatasets = [...datasets].reverse();
 
     setChartData({
-      labels: Array.from({ length: 52 }, (_, i) => i + 1),
+      labels: Array.from({ length: 53 }, (_, i) => i + 1),
       datasets: reversedDatasets,
     });
   }, [stateData, cityData, dataType]);
