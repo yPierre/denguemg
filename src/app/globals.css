@@ -86,7 +86,8 @@ body {
 }
 
 .logo {
-  border-radius: 5px; /* Estilo opcional para o logo */
+  border-radius: 10px; /* Estilo opcional para o logo */
+  background-color: white;
 }
 
 .site-name {

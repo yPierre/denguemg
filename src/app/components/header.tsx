@@ -7,7 +7,7 @@ const Header: React.FC = () => {
         <header className="header">
             <div className="logo-component">
                 <Image
-                    src="/logo3.png" // Caminho da imagem na pasta public
+                    src="/logo4.svg" // Caminho da imagem na pasta public
                     alt="Logo DengueMG"
                     width={40} // Largura da imagem
                     height={40} // Altura da imagem
