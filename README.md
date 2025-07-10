@@ -1,6 +1,6 @@
 # Observatório de Dengue para Minas Gerais
 
-Bem-vindo ao repositório do *dashboard* interativo desenvolvido para monitoramento de dados de dengue em Minas Gerais! Este projeto é parte do meu Trabalho de Conclusão de Curso (TCC), orientado pelo Prof. Vander Luis de Souza Freitas, e tem como objetivo oferecer uma ferramenta ágil e visual para gestores de saúde e o público geral acompanharem a situação da dengue no estado.
+Bem-vindo ao repositório do dashboard interativo desenvolvido para monitoramento de dados de dengue em Minas Gerais. Este projeto tem como objetivo fornecer uma ferramenta ágil e visual para gestores de saúde e o público geral acompanharem a situação epidemiológica da dengue no estado, facilitando a análise de dados e a tomada de decisões.
 
 ## O que ele faz?
 O *dashboard* exibe dados da API pública do InfoDengue, com visualizações como:
