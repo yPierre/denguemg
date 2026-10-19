@@ -2,14 +2,15 @@
 
 import React, { useState } from 'react';
 import { Tooltip as ReactTooltip } from 'react-tooltip';
+import type { DataType } from '@/store/dataStore';
 
 interface ToggleSwitchProps {
   options: {
-    type: 'absolute' | 'per100k' | 'weekly' | 'accumulated';
+    type: DataType;
     label: string;
     tooltip: string;
   }[];
-  onToggleChange: (type: 'absolute' | 'per100k' | 'weekly' | 'accumulated') => void;
+  onToggleChange: (type: DataType) => void;
 }
 
 const ToggleSwitch: React.FC<ToggleSwitchProps> = ({ options, onToggleChange }) => {

@@ -15,19 +15,13 @@ import ChartDataLabels from "chartjs-plugin-datalabels";
 import ChartHeader from "./chartheader";
 import { Context } from 'chartjs-plugin-datalabels';
 import { useDataStore } from "@/store/dataStore";
+import type { CityWeekData } from "@/store/dataStore";
+import { getColorByIncidencia } from "@/utils/colors";
 import Skeleton from "react-loading-skeleton";
 import ToggleSwitch from "./toggleswitch";
 import "react-loading-skeleton/dist/skeleton.css";
 
 Chart.register(BarElement, CategoryScale, LinearScale, Tooltip, Legend);
-
-interface CityData {
-  city: string;
-  geocode: number;
-  casos: number;
-  p_inc100k: number;
-  nivel: number;
-}
 
 export default function BarChart2() {
   const { stateData } = useDataStore();
@@ -53,25 +47,15 @@ export default function BarChart2() {
     return "#C8C8C8";
   };
 
-  const getColorByIncidencia = (incidencia: number) => {
-    if (incidencia >= 300) return "#bd0026";
-    if (incidencia >= 200) return "#f03b20";
-    if (incidencia >= 100) return "#fd8d3c";
-    if (incidencia >= 50) return "#feb24c";
-    if (incidencia >= 10) return "#fed976";
-    if (incidencia >= 0) return "#ffffb2";
-    return "#C8C8C8";
-  };
-
   useEffect(() => {
     if (!currentStateData || !Array.isArray(currentStateData.cities) || !chartWrapperRef.current) return;
 
-    const dataField: keyof CityData = dataType === 'per100k' ? 'p_inc100k' : 'casos';
+    const dataField: keyof CityWeekData = dataType === 'per100k' ? 'p_inc100k' : 'casos';
     const labelText = dataType === 'per100k' ? 'Casos por 100k habitantes' : 'Casos na Última Semana';
 
     // Ordena cidades por número de casos
     const sortedCities = currentStateData.cities
-      .sort((a: CityData, b: CityData) => b[dataField] - a[dataField]);
+      .sort((a: CityWeekData, b: CityWeekData) => b[dataField] - a[dataField]);
 
     // Calcula quantas barras cabem no espaço disponível
     const barThickness = 25; // Largura fixa das barras em pixels
@@ -79,11 +63,11 @@ export default function BarChart2() {
     const maxBars = Math.floor(chartHeight / (barThickness + 5)); // 5px de espaço entre barras
     const visibleCities = sortedCities.slice(0, Math.min(maxBars, sortedCities.length));
 
-    const labels = visibleCities.map((city: CityData) => city.city);
-    const dataValues = visibleCities.map((city: CityData) => 
+    const labels = visibleCities.map((city: CityWeekData) => city.city);
+    const dataValues = visibleCities.map((city: CityWeekData) => 
       dataType === 'per100k' ? Number(city[dataField].toFixed(2)) : city[dataField]
     );
-    const backgroundColors = visibleCities.map((city: CityData) => 
+    const backgroundColors = visibleCities.map((city: CityWeekData) => 
       dataType === 'per100k' ? getColorByIncidencia(city.p_inc100k) : getColorByCasos(city.casos)
     );
 

@@ -1,6 +1,6 @@
 import { create } from "zustand";
 
-type DataType = 'absolute' | 'per100k' | 'weekly' | 'accumulated';
+export type DataType = 'absolute' | 'per100k' | 'weekly' | 'accumulated';
 
 export interface CityWeekData {
   city: string;
@@ -52,10 +52,9 @@ export interface CityData {
 export interface StateData {
   SE: number;
   total_week_cases: number;
-  total_pop: number;
   cities_in_alert_state: number;
   total_notif_accum_year: number;
-  cities: CityWeekData[];
+  cities?: CityWeekData[];
 }
 
 interface DataState {
@@ -64,29 +63,44 @@ interface DataState {
   selectedCity: string | null;
   loading: boolean;
   loadingCity: boolean;
-  dataType: DataType;
   fetchStateData: () => Promise<void>;
   fetchCityData: (city: string) => Promise<void>;
   setSelectedCity: (city: string | null) => void;
-  setDataType: (type: DataType) => void;
   
+}
+
+// Valida o status HTTP antes de interpretar a resposta como JSON.
+async function fetchJson(url: string): Promise<unknown> {
+  const response = await fetch(url);
+  if (!response.ok) {
+    throw new Error(`Requisição falhou com status ${response.status}: ${url}`);
+  }
+  return response.json();
+}
+
+function isCityData(value: unknown): value is CityData {
+  if (typeof value !== "object" || value === null) {
+    return false;
+  }
+  const candidate = value as Partial<CityData>;
+  return typeof candidate.city === "string" && Array.isArray(candidate.data);
 }
 
 export const useDataStore = create<DataState>((set) => ({
   stateData: null,
   cityData: null,
-  dataType: 'absolute',
   selectedCity: null,
   loading: false,
   loadingCity: false,
-  setDataType: (type) => set({ dataType: type }),
 
   // Busca os dados do estado
   fetchStateData: async () => {
     set({ loading: true });
     try {
-      const response = await fetch("api/state");
-      const data = await response.json();
+      const data = await fetchJson("api/state");
+      if (!Array.isArray(data) || data.length === 0) {
+        throw new Error("Formato inesperado na resposta de /api/state");
+      }
       set({ stateData: data, loading: false });
     } catch (error) {
       console.error("Erro ao buscar dados do estado:", error);
@@ -98,8 +112,10 @@ export const useDataStore = create<DataState>((set) => ({
   fetchCityData: async (city) => {
     set({ loadingCity: true });
     try {
-      const response = await fetch(`/api/state?city=${city}`);
-      const data = await response.json();
+      const data = await fetchJson(`/api/state?city=${city}`);
+      if (!isCityData(data)) {
+        throw new Error(`Formato inesperado na resposta de /api/state?city=${city}`);
+      }
       set({ cityData: [data], loadingCity: false });
     } catch (error) {
       console.error("Erro ao buscar dados da cidade(dataStore):", error);

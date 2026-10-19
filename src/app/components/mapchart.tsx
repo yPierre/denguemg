@@ -7,6 +7,12 @@ import { Tooltip as ReactTooltip } from 'react-tooltip';
 import "leaflet/dist/leaflet.css";
 import "react-loading-skeleton/dist/skeleton.css";
 import { useDataStore } from "@/store/dataStore";
+import type { CityWeekData } from "@/store/dataStore";
+import {
+  getColorByIncidencia,
+  getColorByNivel,
+  getColorByNivelColorblind,
+} from "@/utils/colors";
 import L from "leaflet";
 import { Feature, Geometry } from "geojson";
 import LayerSelector from "./layerselector";
@@ -32,12 +38,10 @@ interface GeoFeatureProperties {
   id: number;
 }
 
-interface CityData {
-  city: string;
-  geocode: number;
-  casos: number;
-  nivel: number;
-  p_inc100k: number;
+interface LegendItem {
+  label: string;
+  className?: string;
+  color?: string;
 }
 
 const MapChart: React.FC = () => {
@@ -51,7 +55,7 @@ const MapChart: React.FC = () => {
 
   useEffect(() => {
     if (selectedCity && geoJsonLayerRef.current && stateData) {
-      const city = stateData[0].cities.find((c: CityData) => c.city === selectedCity);
+      const city = stateData[0].cities?.find((c: CityWeekData) => c.city === selectedCity);
       if (city) {
         const feature = geoData?.features.find(
           (f) => Number(f.properties.id) === city.geocode
@@ -115,38 +119,8 @@ const MapChart: React.FC = () => {
     return "#C8C8C8"; // 0-10
   };
 
-  const getColorByNivel = (nivel: number) => {
-    switch (nivel) {
-      case 1: return "#4daf4a";
-      case 2: return "#ffff33";
-      case 3: return "#ff7f00";
-      case 4: return "#e41a1c";
-      default: return "#C8C8C8";
-    }
-  };
-
-  const getColorByNivelColorblind = (nivel: number) => {
-    switch (nivel) {
-      case 1: return "#0077bb"; // Azul escuro
-      case 2: return "#33bbee"; // Azul médio
-      case 3: return "#ee7733"; // Laranja claro
-      case 4: return "#cc3311"; // Vermelho escuro
-      default: return "#bbbbbb"; // Desconhecido
-    }
-  };
-
-  const getColorByIncidencia = (incidencia: number) => {
-    if (incidencia >= 300) return "#bd0026"; // Vinho
-    if (incidencia >= 200) return "#f03b20"; // Vermelho
-    if (incidencia >= 100) return "#fd8d3c"; // Laranja escuro
-    if (incidencia >= 50) return "#feb24c"; // Laranja claro
-    if (incidencia >= 10) return "#fed976"; // Amarelo escuro
-    if (incidencia >= 0) return "#ffffb2"; // Amarelo claro
-    return "#C8C8C8";
-  };
-
-  const citiesMap = new Map<number, CityData>();
-  stateData[0].cities.forEach((city: CityData) => {
+  const citiesMap = new Map<number, CityWeekData>();
+  stateData[0].cities?.forEach((city: CityWeekData) => {
     citiesMap.set(city.geocode, city);
   });
 
@@ -232,6 +206,42 @@ const MapChart: React.FC = () => {
     setVisualization(type);
   };
 
+  // Itens da legenda conforme a camada exibida.
+  // "casos" e "incidencia" usam classes CSS; "nivel" usa cores inline (com variante daltônica).
+  const legendItems: LegendItem[] =
+    visualization === 'casos'
+      ? [
+          { label: "300+", className: "casos-300-plus" },
+          { label: "200-300", className: "casos-200-300" },
+          { label: "100-200", className: "casos-100-200" },
+          { label: "50-100", className: "casos-50-100" },
+          { label: "10-50", className: "casos-10-50" },
+          { label: "0-10", className: "casos-0-10" },
+        ]
+      : visualization === 'nivel'
+      ? [
+          { label: "Alta Incidência", color: isColorblindMode ? getColorByNivelColorblind(4) : getColorByNivel(4) },
+          { label: "Transmissão ativa", color: isColorblindMode ? getColorByNivelColorblind(3) : getColorByNivel(3) },
+          { label: "Atenção", color: isColorblindMode ? getColorByNivelColorblind(2) : getColorByNivel(2) },
+          { label: "Baixa Transmissão", color: isColorblindMode ? getColorByNivelColorblind(1) : getColorByNivel(1) },
+          { label: "Desconhecido", color: isColorblindMode ? getColorByNivelColorblind(0) : getColorByNivel(0) },
+        ]
+      : [
+          { label: "300+", className: "incidencia-300-plus" },
+          { label: "200-300", className: "incidencia-200-300" },
+          { label: "100-200", className: "incidencia-100-200" },
+          { label: "50-100", className: "incidencia-50-100" },
+          { label: "10-50", className: "incidencia-10-50" },
+          { label: "0-10", className: "incidencia-0-10" },
+        ];
+
+  const legendTitle =
+    visualization === 'casos'
+      ? "Intensidade de Casos"
+      : visualization === 'nivel'
+      ? "Nível de Alerta"
+      : "Incidência por 100 mil habitantes";
+
   return (
     <div className="map-container">
       <ChartHeader title="Mapa de Alertas de Dengue na Última Semana">
@@ -281,7 +291,6 @@ const MapChart: React.FC = () => {
             place="bottom"
           />
         </button>
-        {!mapReady}
         {mapReady && (
           <MapContainer
             center={[-18.5122, -44.555]}
@@ -305,93 +314,20 @@ const MapChart: React.FC = () => {
           </MapContainer>
         )}
       </div>
-      {visualization === 'casos' ? (
-        <div className="legend">
-          <h4>Intensidade de Casos</h4>
-          <div className="legend-items">
-            <div className="legend-item">
-              <div className="legend-color casos-300-plus" />
-              <span>300+</span>
+      <div className="legend">
+        <h4>{legendTitle}</h4>
+        <div className="legend-items">
+          {legendItems.map((item) => (
+            <div className="legend-item" key={item.label}>
+              <div
+                className={item.className ? `legend-color ${item.className}` : "legend-color"}
+                style={item.color ? { backgroundColor: item.color } : undefined}
+              />
+              <span>{item.label}</span>
             </div>
-            <div className="legend-item">
-              <div className="legend-color casos-200-300" />
-              <span>200-300</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color casos-100-200" />
-              <span>100-200</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color casos-50-100" />
-              <span>50-100</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color casos-10-50" />
-              <span>10-50</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color casos-0-10" />
-              <span>0-10</span>
-            </div>
-          </div>
+          ))}
         </div>
-      ) : visualization === 'nivel' ? (
-        <div className="legend">
-          <h4>Nível de Alerta</h4>
-          <div className="legend-items">
-            <div className="legend-item">
-              <div className="legend-color" style={{ backgroundColor: isColorblindMode ? getColorByNivelColorblind(4) : getColorByNivel(4) }} />
-              <span>Alta Incidência</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color" style={{ backgroundColor: isColorblindMode ? getColorByNivelColorblind(3) : getColorByNivel(3) }} />
-              <span>Transmissão ativa</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color" style={{ backgroundColor: isColorblindMode ? getColorByNivelColorblind(2) : getColorByNivel(2) }} />
-              <span>Atenção</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color" style={{ backgroundColor: isColorblindMode ? getColorByNivelColorblind(1) : getColorByNivel(1) }} />
-              <span>Baixa Transmissão</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color" style={{ backgroundColor: isColorblindMode ? getColorByNivelColorblind(0) : getColorByNivel(0) }} />
-              <span>Desconhecido</span>
-            </div>
-          </div>
-        </div>
-      ) : (
-        <div className="legend">
-          <h4>Incidência por 100 mil habitantes</h4>
-          <div className="legend-items">
-            <div className="legend-item">
-              <div className="legend-color incidencia-300-plus" />
-              <span>300+</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color incidencia-200-300" />
-              <span>200-300</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color incidencia-100-200" />
-              <span>100-200</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color incidencia-50-100" />
-              <span>50-100</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color incidencia-10-50" />
-              <span>10-50</span>
-            </div>
-            <div className="legend-item">
-              <div className="legend-color incidencia-0-10" />
-              <span>0-10</span>
-            </div>
-          </div>
-        </div>
-      )}
+      </div>
     </div>
   );
 };

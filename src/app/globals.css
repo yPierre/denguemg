@@ -203,6 +203,9 @@ body {
   background-color: #ffffff;
   box-sizing: border-box;
   flex: 0 0 calc(40% - 40px);
+  /* Impede que a altura do item flex seja influenciada pelo conteúdo (min-height: auto),
+     o que prendia o gráfico ao tamanho herdado do breakpoint mobile após redimensionar. */
+  min-height: 0;
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
 }
 

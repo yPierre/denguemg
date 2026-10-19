@@ -15,7 +15,7 @@ export function adaptCityData(cityName: string, stateData: StateData[]): CityDat
   };
 
   stateData.forEach(week => {
-    const cityInWeek: CityWeekData | undefined = week.cities.find(c => c.city === cityName);
+    const cityInWeek: CityWeekData | undefined = week.cities?.find(c => c.city === cityName);
     if (cityInWeek) {
       // Preenche o geocode na primeira iteração
       if (adaptedData.geocode === 0) {

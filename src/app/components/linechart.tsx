@@ -13,6 +13,7 @@ import {
 } from "chart.js";
 import annotationPlugin from "chartjs-plugin-annotation";
 import { useDataStore } from "@/store/dataStore";
+import type { DataType } from "@/store/dataStore";
 import ChartHeader from "./chartheader";
 import Skeleton from "react-loading-skeleton";
 import ToggleSwitch from "./toggleswitch";
@@ -36,7 +37,7 @@ type DataEntry = StateDataEntry | CityDataEntry;
 
 export default function LineChart() {
   const { stateData, cityData } = useDataStore();
-  const [dataType, setDataType] = useState<'absolute' | 'per100k' | 'weekly' | 'accumulated'>('weekly');
+  const [dataType, setDataType] = useState<DataType>('weekly');
   const [chartData, setChartData] = useState<{
     labels: number[];
     datasets: {
